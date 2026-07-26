@@ -411,17 +411,122 @@
 	<T.MeshStandardMaterial color="#3a3a3a" />
 </T.Mesh>
 
-<!-- Mouse - MOVED LEFT with keyboard -->
-<T.Mesh position={[0.25, 0.605, -2.2]}>
-	<T.BoxGeometry args={[0.06, 0.03, 0.09]} />
-	<T.MeshStandardMaterial color="#1a1a1a" />
-</T.Mesh>
-
-<!-- Mouse Wheel -->
-<T.Mesh position={[0.25, 0.62, -2.17]}>
-	<T.CylinderGeometry args={[0.005, 0.005, 0.03]} rotation={[0, 0, Math.PI / 2]} />
-	<T.MeshStandardMaterial color="#4a4a4a" />
-</T.Mesh>
+<!-- ================= DETAILED REALISTIC MOUSE ================= -->
+<T.Group position={[0.25, 0.605, -2.2]}>
+	<!-- Mouse Main Body (ergonomic curved shape using scaled sphere) - TALLER -->
+	<T.Mesh position={[0, 0.012, 0]} scale={[1, 0.7, 1.4]}>
+		<T.SphereGeometry args={[0.038, 32, 24]} />
+		<T.MeshStandardMaterial 
+			color="#1a1a1a" 
+			roughness={0.4} 
+			metalness={0.1}
+		/>
+	</T.Mesh>
+	
+	<!-- Mouse Palm Rest (rear hump) - TALLER -->
+	<T.Mesh position={[0, 0.02, 0.02]} scale={[1, 0.75, 1.1]}>
+		<T.SphereGeometry args={[0.035, 24, 16]} />
+		<T.MeshStandardMaterial 
+			color="#1f1f1f" 
+			roughness={0.35} 
+			metalness={0.15}
+		/>
+	</T.Mesh>
+	
+	<!-- Left Mouse Button (separate piece) - RAISED -->
+	<T.Mesh position={[-0.018, 0.028, -0.035]}>
+		<T.BoxGeometry args={[0.028, 0.015, 0.045]} />
+		<T.MeshStandardMaterial 
+			color="#222222" 
+			roughness={0.3} 
+			metalness={0.05}
+		/>
+	</T.Mesh>
+	
+	<!-- Right Mouse Button (separate piece) - RAISED -->
+	<T.Mesh position={[0.018, 0.028, -0.035]}>
+		<T.BoxGeometry args={[0.028, 0.015, 0.045]} />
+		<T.MeshStandardMaterial 
+			color="#222222" 
+			roughness={0.3} 
+			metalness={0.05}
+		/>
+	</T.Mesh>
+	
+	<!-- Mouse Button Gap/Seam - RAISED -->
+	<T.Mesh position={[0, 0.032, -0.035]}>
+		<T.BoxGeometry args={[0.003, 0.01, 0.04]} />
+		<T.MeshBasicMaterial color="#0a0a0a" />
+	</T.Mesh>
+	
+	<!-- Scroll Wheel Housing - RAISED -->
+	<T.Mesh position={[0, 0.038, -0.025]}>
+		<T.BoxGeometry args={[0.016, 0.012, 0.025]} />
+		<T.MeshStandardMaterial color="#2a2a2a" />
+	</T.Mesh>
+	
+	<!-- Scroll Wheel (main cylinder with grip) - RAISED -->
+	<T.Mesh position={[0, 0.046, -0.025]} rotation={[0, 0, Math.PI / 2]}>
+		<T.CylinderGeometry args={[0.008, 0.008, 0.014, 16]} />
+		<T.MeshStandardMaterial 
+			color="#4a4a4a" 
+			roughness={0.6}
+			metalness={0.3}
+		/>
+	</T.Mesh>
+	
+	<!-- Scroll Wheel Grip Lines - RAISED -->
+	{#each [-0.003, 0, 0.003] as offset}
+		<T.Mesh position={[offset, 0.046, -0.025]} rotation={[0, 0, Math.PI / 2]}>
+			<T.CylinderGeometry args={[0.0082, 0.0082, 0.002, 8]} />
+			<T.MeshStandardMaterial color="#333333" />
+		</T.Mesh>
+	{/each}
+	
+	<!-- Side Buttons (Forward/Back) - RAISED -->
+	<T.Mesh position={[-0.038, 0.025, -0.015]}>
+		<T.BoxGeometry args={[0.006, 0.012, 0.018]} />
+		<T.MeshStandardMaterial color="#252525" />
+	</T.Mesh>
+	<T.Mesh position={[-0.038, 0.025, 0.008]}>
+		<T.BoxGeometry args={[0.006, 0.012, 0.015]} />
+		<T.MeshStandardMaterial color="#252525" />
+	</T.Mesh>
+	
+	<!-- Mouse Feet (PTFE sliders) - Front Left -->
+	<T.Mesh position={[-0.022, -0.008, -0.045]}>
+		<T.BoxGeometry args={[0.015, 0.003, 0.02]} />
+		<T.MeshStandardMaterial color="#111111" roughness={0.2} />
+	</T.Mesh>
+	<!-- Mouse Feet - Front Right -->
+	<T.Mesh position={[0.022, -0.008, -0.045]}>
+		<T.BoxGeometry args={[0.015, 0.003, 0.02]} />
+		<T.MeshStandardMaterial color="#111111" roughness={0.2} />
+	</T.Mesh>
+	<!-- Mouse Feet - Rear -->
+	<T.Mesh position={[0, -0.008, 0.045]}>
+		<T.BoxGeometry args={[0.04, 0.003, 0.025]} />
+		<T.MeshStandardMaterial color="#111111" roughness={0.2} />
+	</T.Mesh>
+	
+	<!-- Logo/Brand Indentation on palm - RAISED -->
+	<T.Mesh position={[0, 0.038, 0.035]}>
+		<T.PlaneGeometry args={[0.015, 0.02]} />
+		<T.MeshBasicMaterial color="#2a2a2a" />
+	</T.Mesh>
+	
+	<!-- RGB LED Strip (subtle underglow) -->
+	<T.Mesh position={[0, -0.012, 0]}>
+		<T.RingGeometry args={[0.028, 0.036, 32]} rotation={[Math.PI / 2, 0, 0]} />
+		<T.MeshBasicMaterial color="#4a90d9" transparent opacity={0.6} />
+	</T.Mesh>
+	
+	<!-- Wireless USB Dongle (small, near mouse) -->
+	<T.Mesh position={[0.15, 0.602, -2.25]}>
+		<T.BoxGeometry args={[0.012, 0.004, 0.02]} />
+		<T.MeshStandardMaterial color="#1a1a1a" />
+	</T.Mesh>
+</T.Group>
 
 <!-- ================= DESK ACCESSORIES (CLEANED UP) ================= -->
 
