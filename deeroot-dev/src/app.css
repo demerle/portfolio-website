@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	font-family: 'Inter', sans-serif;
+	background-color: #0a0a1a;
+	color: #ffffff;
+	overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: #0a0a1a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #4a90d9;
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #ff6b9d;
+}
+
+/* Glassmorphism card utility */
+.glass-card {
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 16px;
+}
