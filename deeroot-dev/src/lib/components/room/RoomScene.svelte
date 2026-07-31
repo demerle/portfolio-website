@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { T, useTask } from '@threlte/core';
 	import SceneLighting from './SceneLighting.svelte';
+	import PianoKeyboard from './PianoKeyboard.svelte';
 	
 	// Breathing animation for character
 	let breatheOffset = $state(0);
@@ -555,6 +556,12 @@
 	<T.BoxGeometry args={[0.035, 0.005, 0.07]} />
 	<T.MeshStandardMaterial color="#1a1a1a" />
 </T.Mesh>
+
+<!-- ================= YAMAHA P-525 DIGITAL PIANO ================= -->
+<!-- Full-size 88-key piano placed to the left of the desk. -->
+<T.Group position={[-1.2, 0.02, -2.1]} scale={0.84}>
+	<PianoKeyboard />
+</T.Group>
 
 <!-- ================= CHAIR (Smaller, facing desk) ================= -->
 <!-- Chair positioned in front of desk, facing toward it -->
