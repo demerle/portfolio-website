@@ -1,3 +1,5 @@
+You have passwordless sudo priveleges inside of a docker container. Dont be afraid to use sudo commands.
+
 As a coding agent, there are a clear rules that you should operate under.
 
 When generating plans or mapping out a project, never estimate how much time it will take.

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { T, useTask, useLoader } from '@threlte/core';
-	import { TextureLoader } from 'three';
+	import { TextureLoader, DoubleSide } from 'three';
 	import SceneLighting from './SceneLighting.svelte';
 	import PianoKeyboard from './PianoKeyboard.svelte';
 	
@@ -540,23 +540,48 @@
 
 <!-- ================= DESK ACCESSORIES (CLEANED UP) ================= -->
 
-<!-- Coffee Cup on desk - RIGHT SIDE, pushed back -->
-<T.Mesh position={[0.45, 0.65, -2.1]}>
-	<T.CylinderGeometry args={[0.035, 0.03, 0.06]} />
-	<T.MeshStandardMaterial color="#ffffff" />
+<!-- Coaster under mug -->
+<T.Mesh position={[0.45, 0.6115, -2.1]}>
+	<T.CylinderGeometry args={[0.05, 0.05, 0.003, 32]} />
+	<T.MeshStandardMaterial color="#8b5a2b" roughness={0.9} />
 </T.Mesh>
 
-<!-- Coffee Liquid -->
-<T.Mesh position={[0.45, 0.68, -2.1]}>
-	<T.CircleGeometry args={[0.025, 16]} rotation={[-Math.PI / 2, 0, 0]} />
-	<T.MeshBasicMaterial color="#3d2817" />
-</T.Mesh>
+<!-- Mug group -->
+<T.Group position={[0.45, 0.639, -2.1]}>
+	<!-- Mug body (open-ended cylinder so we can see the coffee inside) -->
+	<T.Mesh>
+		<T.CylinderGeometry args={[0.032, 0.028, 0.058, 32, 1, true]} />
+		<T.MeshStandardMaterial color="#f5f5f5" roughness={0.25} metalness={0.05} side={DoubleSide} />
+	</T.Mesh>
+
+	<!-- Mug interior bottom -->
+	<T.Mesh position={[0, -0.0294, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+		<T.CircleGeometry args={[0.0275, 32]} />
+		<T.MeshStandardMaterial color="#e8e8e8" roughness={0.35} metalness={0.05} side={DoubleSide} />
+	</T.Mesh>
+
+	<!-- Mug handle (half-torus on the right, attached to the body) -->
+	<T.Mesh position={[0.022, 0, 0]} rotation={[0, 0, Math.PI * 1.5]}>
+		<T.TorusGeometry args={[0.025, 0.005, 12, 32, Math.PI]} />
+		<T.MeshStandardMaterial color="#f5f5f5" roughness={0.25} metalness={0.05} />
+	</T.Mesh>
+
+	<!-- Coffee liquid -->
+	<T.Mesh position={[0, 0.022, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+		<T.CircleGeometry args={[0.029, 32]} />
+		<T.MeshStandardMaterial color="#3a2410" roughness={0.15} metalness={0} />
+	</T.Mesh>
+</T.Group>
 
 <!-- Steam -->
-{#each [0, 1] as i}
-	<T.Mesh position={[0.45 + (Math.random() - 0.5) * 0.02, 0.71 + i * 0.04, -2.1 + (Math.random() - 0.5) * 0.02]}>
-		<T.SphereGeometry args={[0.008 - i * 0.003]} />
-		<T.MeshBasicMaterial color="#ffffff" transparent opacity={0.25 - i * 0.1} />
+{#each [
+	{x: 0.445, y: 0.675, z: -2.095},
+	{x: 0.452, y: 0.695, z: -2.102},
+	{x: 0.448, y: 0.715, z: -2.098}
+] as puff, i}
+	<T.Mesh position={[puff.x, puff.y, puff.z]}>
+		<T.SphereGeometry args={[0.006 + i * 0.0015, 12, 12]} />
+		<T.MeshBasicMaterial color="#ffffff" transparent opacity={0.18 - i * 0.04} />
 	</T.Mesh>
 {/each}
 
