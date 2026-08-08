@@ -115,10 +115,6 @@
 					metalness={0.02}
 				/>
 			</T.Mesh>
-			<T.Mesh position={[key.x + whiteKeyWidth / 2, 0.798, whiteKeyZ + 0.012]}>
-				<T.BoxGeometry args={[0.0009, 0.004, whiteKeyLength - 0.018]} />
-				<T.MeshBasicMaterial color="#c7c1b6" />
-			</T.Mesh>
 		{/each}
 
 		<!-- 36 black keys, grouped naturally as 2s and 3s across the full 88-key layout -->
@@ -126,10 +122,6 @@
 			<T.Mesh position={[key.x, 0.807, blackKeyZ]}>
 				<T.BoxGeometry args={[blackKeyWidth, 0.036, blackKeyLength]} />
 				<T.MeshStandardMaterial color="#060606" roughness={0.25} metalness={0.08} />
-			</T.Mesh>
-			<T.Mesh position={[key.x, 0.829, blackKeyZ - 0.01]}>
-				<T.BoxGeometry args={[blackKeyWidth * 0.82, 0.008, blackKeyLength * 0.66]} />
-				<T.MeshStandardMaterial color="#1b1b1b" roughness={0.2} metalness={0.12} />
 			</T.Mesh>
 		{/each}
 
