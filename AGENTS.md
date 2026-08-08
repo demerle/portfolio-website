@@ -5,11 +5,9 @@ As a coding agent, there are a clear rules that you should operate under.
 When generating plans or mapping out a project, never estimate how much time it will take.
 
 
-When generating tests and test cases, always prioritize end to end testing over smaller unit tests. It is far more important that the errors are caught during development than if the tests are "atomic".
+Intructions on creating 3D assets in threeJS/svelte:
 
-Also, when it comes to testing, always prefer NOT to use "Mocks" or "Fakes" of things unless ABSOLUTELY NECESSARY. For example, if a function needs a pdf object as an input, use a local "dummy.pdf" or something instead using a mock library. This will give more realistic output/errors when running the tests, catching more edge cases.
-
-IF you are writing Python code, prioritize readability of the code over trying to write "one-liners". To be specific, never use dictionary comprehension at all, and for list comphrehensions, only use it if the meaning is extremely simple in obvious.
-
-
+- When creating things in 3D, you must ALWAYS evaluate the result from multiple, close camera angles.
+- Use real screenshots and images to confirm the creation/completion of a given task.
+- If the result seems not up to par or has issues (misalignment, impossible phyiscs), address and fix the issue immediately.
 
