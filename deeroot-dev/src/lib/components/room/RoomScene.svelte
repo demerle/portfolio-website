@@ -559,7 +559,7 @@
 
 <!-- ================= YAMAHA P-525 DIGITAL PIANO ================= -->
 <!-- Full-size 88-key piano placed to the left of the desk. -->
-<T.Group position={[-1.2, 0.02, -2.1]} scale={0.84}>
+<T.Group position={[-1.28, 0.02, -2.1]} scale={0.84}>
 	<PianoKeyboard />
 </T.Group>
 

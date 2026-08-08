@@ -90,14 +90,14 @@
 		</T.Mesh>
 
 		<!-- Slightly raised back control deck -->
-		<T.Mesh position={[0, 0.77, -0.13]}>
-			<T.BoxGeometry args={[bodyWidth - 0.06, 0.026, 0.105]} />
+		<T.Mesh position={[0, 0.77, -0.1025]}>
+			<T.BoxGeometry args={[bodyWidth - 0.095, 0.026, 0.16]} />
 			<T.MeshStandardMaterial color="#101010" roughness={0.3} metalness={0.25} />
 		</T.Mesh>
 
 		<!-- Keybed tray and red felt strip -->
 		<T.Mesh position={[0, 0.758, 0.072]}>
-			<T.BoxGeometry args={[keybedWidth + 0.035, 0.018, whiteKeyLength + 0.035]} />
+			<T.BoxGeometry args={[keybedWidth + 0.019, 0.018, whiteKeyLength + 0.035]} />
 			<T.MeshStandardMaterial color="#050505" roughness={0.42} />
 		</T.Mesh>
 		<T.Mesh position={[0, 0.784, -0.012]}>
@@ -126,12 +126,12 @@
 		{/each}
 
 		<!-- End cheeks around the action -->
-		<T.Mesh position={[-0.638, 0.787, 0.067]}>
-			<T.BoxGeometry args={[0.035, 0.055, 0.18]} />
+		<T.Mesh position={[-0.638, 0.787, -0.01275]}>
+			<T.BoxGeometry args={[0.035, 0.055, 0.3395]} />
 			<T.MeshStandardMaterial color="#0d0d0d" roughness={0.32} metalness={0.15} />
 		</T.Mesh>
-		<T.Mesh position={[0.638, 0.787, 0.067]}>
-			<T.BoxGeometry args={[0.035, 0.055, 0.18]} />
+		<T.Mesh position={[0.638, 0.787, -0.01275]}>
+			<T.BoxGeometry args={[0.035, 0.055, 0.3395]} />
 			<T.MeshStandardMaterial color="#0d0d0d" roughness={0.32} metalness={0.15} />
 		</T.Mesh>
 
