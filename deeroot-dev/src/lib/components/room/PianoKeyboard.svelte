@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { T } from '@threlte/core';
+	import { RoundedBoxGeometry } from '@threlte/extras';
 
-	const bodyWidth = 1.336;
-	const bodyDepth = 0.376;
 	const keybedWidth = 1.222;
 	const whiteKeyCount = 52;
 	const whiteKeyWidth = keybedWidth / whiteKeyCount;
@@ -13,10 +12,28 @@
 	const whiteNotes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 	const blackAfter = new Set(['A', 'C', 'D', 'F', 'G']);
 	const keybedLeft = -keybedWidth / 2;
-	const whiteKeyZ = 0.072;
+	// Keys sit just in front of the case so there is no forward lip
+	const whiteKeyZ = 0.106;
 	const blackKeyZ = whiteKeyZ - whiteKeyLength / 2 + blackKeyLength / 2;
 	const standScale = 0.8;
 	const keyboardDrop = 0.605 * (1 - standScale);
+
+	// Case exactly frames the keybed/cheeks so no side lips stick out
+	const cheekWidth = 0.025;
+	const cheekX = keybedWidth / 2 + cheekWidth / 2;
+	const bodyWidth = cheekX * 2 + cheekWidth;
+	const bodyDepth = 0.366;
+	const bodyHeight = 0.1;
+	const bodyY = 0.66;
+	const bodyTopY = bodyY + bodyHeight / 2;
+	const bodyZ = -0.005;
+	const bodyFrontZ = bodyZ + bodyDepth / 2;
+	const cheekZ = 0.1015;
+	const cheekDepth = 0.163;
+	const cheekHeight = 0.04;
+	const cheekY = 0.725; // flush with control deck top from camera angle
+	const controlDeckZ = -0.06;
+	const caseColor = '#121212';
 
 	const whiteKeys = Array.from({ length: whiteKeyCount }, (_, index) => ({
 		index,
@@ -79,35 +96,21 @@
 
 	<!-- Keyboard body, lowered to sit on the smaller stand -->
 	<T.Group position={[0, -keyboardDrop, 0]}>
-		<!-- Main chassis -->
-		<T.Mesh position={[0, 0.675, 0]}>
-			<T.BoxGeometry args={[bodyWidth, 0.13, bodyDepth]} />
+		<!-- Main chassis: the case itself acts as the keybed, so keys sit directly on it -->
+		<T.Mesh position={[0, bodyY, bodyZ]}>
+			<RoundedBoxGeometry args={[bodyWidth, bodyHeight, bodyDepth]} radius={0.005} smoothness={4} />
 			<T.MeshStandardMaterial color="#121212" roughness={0.34} metalness={0.18} />
 		</T.Mesh>
-		<T.Mesh position={[0, 0.745, -0.035]}>
-			<T.BoxGeometry args={[bodyWidth - 0.035, 0.018, bodyDepth - 0.05]} />
-			<T.MeshStandardMaterial color="#1b1b1b" roughness={0.27} metalness={0.2} />
-		</T.Mesh>
 
-		<!-- Slightly raised back control deck -->
-		<T.Mesh position={[0, 0.77, -0.1025]}>
-			<T.BoxGeometry args={[bodyWidth - 0.095, 0.026, 0.16]} />
-			<T.MeshStandardMaterial color="#101010" roughness={0.3} metalness={0.25} />
-		</T.Mesh>
-
-		<!-- Keybed tray and red felt strip -->
-		<T.Mesh position={[0, 0.758, 0.072]}>
-			<T.BoxGeometry args={[keybedWidth + 0.019, 0.018, whiteKeyLength + 0.035]} />
-			<T.MeshStandardMaterial color="#050505" roughness={0.42} />
-		</T.Mesh>
-		<T.Mesh position={[0, 0.784, -0.012]}>
+		<!-- Red felt strip at the back of the white keys -->
+		<T.Mesh position={[0, bodyTopY + 0.004, whiteKeyZ - whiteKeyLength / 2 - 0.004]}>
 			<T.BoxGeometry args={[keybedWidth, 0.006, 0.009]} />
 			<T.MeshBasicMaterial color="#6d1218" />
 		</T.Mesh>
 
 		<!-- 52 full-size white keys from A0 to C8 -->
 		{#each whiteKeys as key}
-			<T.Mesh position={[key.x, 0.785, whiteKeyZ]}>
+			<T.Mesh position={[key.x, bodyTopY + 0.011, whiteKeyZ]}>
 				<T.BoxGeometry args={[whiteKeyWidth - whiteKeyGap, 0.022, whiteKeyLength]} />
 				<T.MeshStandardMaterial
 					color={key.index % 7 === 2 || key.index % 7 === 5 ? '#f1eee6' : '#faf8f0'}
@@ -119,52 +122,62 @@
 
 		<!-- 36 black keys, grouped naturally as 2s and 3s across the full 88-key layout -->
 		{#each blackKeys as key}
-			<T.Mesh position={[key.x, 0.807, blackKeyZ]}>
+			<T.Mesh position={[key.x, bodyTopY + 0.033, blackKeyZ]}>
 				<T.BoxGeometry args={[blackKeyWidth, 0.036, blackKeyLength]} />
 				<T.MeshStandardMaterial color="#060606" roughness={0.25} metalness={0.08} />
 			</T.Mesh>
 		{/each}
 
-		<!-- End cheeks around the action -->
-		<T.Mesh position={[-0.638, 0.787, -0.01275]}>
-			<T.BoxGeometry args={[0.035, 0.055, 0.3395]} />
-			<T.MeshStandardMaterial color="#0d0d0d" roughness={0.32} metalness={0.15} />
+	<!-- End cheeks around the action: rounded, flush with the case sides, same material as the body so they read as one piece -->
+	{#each [-cheekX, cheekX] as x}
+		<T.Mesh position={[x, cheekY, cheekZ]}>
+			<RoundedBoxGeometry args={[cheekWidth, cheekHeight, cheekDepth]} radius={0.004} smoothness={4} />
+			<T.MeshStandardMaterial color={caseColor} roughness={0.34} metalness={0.18} />
 		</T.Mesh>
-		<T.Mesh position={[0.638, 0.787, -0.01275]}>
-			<T.BoxGeometry args={[0.035, 0.055, 0.3395]} />
-			<T.MeshStandardMaterial color="#0d0d0d" roughness={0.32} metalness={0.15} />
+	{/each}
+
+		<!-- Slightly raised back control deck, spanning between the cheeks -->
+		<T.Mesh position={[0, 0.74, controlDeckZ]}>
+			<RoundedBoxGeometry args={[keybedWidth, 0.04, 0.16]} radius={0.004} smoothness={4} />
+			<T.MeshStandardMaterial color={caseColor} roughness={0.34} metalness={0.18} />
 		</T.Mesh>
 
 		<!-- Control surface: speakers, display, buttons, and knobs. -->
 		{#each speakerSlots as slot}
-			<T.Mesh position={[slot.x, 0.787, -0.132]}>
+			<T.Mesh position={[slot.x, 0.757, -0.0895]}>
 				<T.BoxGeometry args={[0.006, 0.006, 0.07]} />
 				<T.MeshBasicMaterial color="#050505" />
 			</T.Mesh>
 		{/each}
 		{#each rightSpeakerSlots as slot}
-			<T.Mesh position={[slot.x, 0.787, -0.132]}>
+			<T.Mesh position={[slot.x, 0.757, -0.0895]}>
 				<T.BoxGeometry args={[0.006, 0.006, 0.07]} />
 				<T.MeshBasicMaterial color="#050505" />
 			</T.Mesh>
 		{/each}
-		<T.Mesh position={[0, 0.79, -0.133]}>
+		<T.Mesh position={[0, 0.76, -0.0905]}>
 			<T.BoxGeometry args={[0.13, 0.008, 0.046]} />
 			<T.MeshBasicMaterial color="#182436" />
 		</T.Mesh>
 		{#each [-0.22, -0.18, -0.14, 0.14, 0.18, 0.22] as x}
-			<T.Mesh position={[x, 0.792, -0.132]} rotation={[Math.PI / 2, 0, 0]}>
+			<T.Mesh position={[x, 0.762, -0.0895]} rotation={[Math.PI / 2, 0, 0]}>
 				<T.CylinderGeometry args={[0.012, 0.012, 0.008, 24]} />
 				<T.MeshStandardMaterial color="#222222" roughness={0.2} metalness={0.22} />
 			</T.Mesh>
 		{/each}
 
+		<!-- Subtle highlight bevel along the front top edge -->
+		<T.Mesh position={[0, bodyTopY - 0.002, bodyFrontZ - 0.001]}>
+			<RoundedBoxGeometry args={[bodyWidth - 0.02, 0.003, 0.004]} radius={0.001} smoothness={4} />
+			<T.MeshStandardMaterial color="#2a2a2a" roughness={0.25} metalness={0.2} />
+		</T.Mesh>
+
 		<!-- Yamaha-style front badge and subtle bevel lines -->
-		<T.Mesh position={[0, 0.718, 0.191]}>
+		<T.Mesh position={[0, bodyY, bodyFrontZ - 0.002]}>
 			<T.BoxGeometry args={[0.105, 0.022, 0.004]} />
 			<T.MeshStandardMaterial color="#d5d2c8" roughness={0.18} metalness={0.35} />
 		</T.Mesh>
-		<T.Mesh position={[0, 0.612, 0.192]}>
+		<T.Mesh position={[0, bodyY - bodyHeight / 2 + 0.006, bodyFrontZ - 0.002]}>
 			<T.BoxGeometry args={[bodyWidth - 0.06, 0.006, 0.004]} />
 			<T.MeshBasicMaterial color="#2b2b2b" />
 		</T.Mesh>
