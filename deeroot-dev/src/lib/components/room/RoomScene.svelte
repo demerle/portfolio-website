@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { T, useTask } from '@threlte/core';
+	import { T, useTask, useLoader } from '@threlte/core';
+	import { TextureLoader } from 'three';
 	import SceneLighting from './SceneLighting.svelte';
 	import PianoKeyboard from './PianoKeyboard.svelte';
 	
@@ -11,6 +12,9 @@
 		time += delta;
 		breatheOffset = Math.sin(time * 2) * 0.015;
 	});
+
+	// Second monitor screen texture
+	const screenTexture = useLoader(TextureLoader).load('/monitor-screen.png');
 </script>
 
 <!-- Camera - Center of room looking at desk -->
@@ -202,11 +206,13 @@
 	<T.MeshStandardMaterial color="#0a0a0a" />
 </T.Mesh>
 
-<!-- Monitor Screen (Glowing) - Left monitor -->
-<T.Mesh position={[-0.405, 0.84, -2.035]} rotation={[0, 1.047, 0]}>
-	<T.PlaneGeometry args={[0.45, 0.28]} />
-	<T.MeshBasicMaterial color="#8bc7ff" />
-</T.Mesh>
+<!-- Monitor Screen - Left monitor -->
+{#if $screenTexture}
+	<T.Mesh position={[-0.405, 0.84, -2.035]} rotation={[0, 1.047, 0]}>
+		<T.PlaneGeometry args={[0.45, 0.28]} />
+		<T.MeshBasicMaterial map={$screenTexture} toneMapped={false} />
+	</T.Mesh>
+{/if}
 
 <!-- PC Tower UNDER DESK (shorter to fit lower desk) -->
 <!-- Main PC case -->

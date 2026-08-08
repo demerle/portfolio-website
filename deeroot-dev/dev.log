@@ -1,0 +1,24 @@
+
+> deeroot-dev@0.0.1 dev
+> vite dev --host --port 5174
+
+Port 5174 is in use, trying another one...
+
+  VITE v8.1.5  ready in 1602 ms
+
+  ➜  Local:   http://localhost:5175/
+  ➜  Network: http://100.100.31.105:5175/
+  ➜  Network: http://100.113.14.31:5175/
+  ➜  Network: http://172.18.0.1:5175/
+3:35:07 PM [vite] (client) dependency optimized: three
+3:35:07 PM [vite] (client) optimized dependencies changed. reloading
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:35:32 PM [vite] (ssr) page reload .svelte-kit/generated/shared/error-template.js
+3:35:32 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:35:32 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:35:32 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:35:32 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
