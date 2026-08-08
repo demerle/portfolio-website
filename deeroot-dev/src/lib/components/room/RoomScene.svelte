@@ -13,8 +13,9 @@
 		breatheOffset = Math.sin(time * 2) * 0.015;
 	});
 
-	// Second monitor screen texture
-	const screenTexture = useLoader(TextureLoader).load('/monitor-screen.png');
+	// Monitor screen textures
+	const firstMonitorTexture = useLoader(TextureLoader).load('/first-monitor.png');
+	const secondMonitorTexture = useLoader(TextureLoader).load('/second-monitor.png');
 </script>
 
 <!-- Camera - Center of room looking at desk -->
@@ -176,10 +177,12 @@
 </T.Mesh>
 
 <!-- Monitor Screen (Glowing) - SMALLER -->
-<T.Mesh position={[0, 0.88, -2.235]}>
-	<T.PlaneGeometry args={[0.45, 0.28]} />
-	<T.MeshBasicMaterial color="#8bc7ff" />
-</T.Mesh>
+{#if $firstMonitorTexture}
+	<T.Mesh position={[0, 0.88, -2.235]}>
+		<T.PlaneGeometry args={[0.45, 0.28]} />
+		<T.MeshBasicMaterial map={$firstMonitorTexture} toneMapped={false} />
+	</T.Mesh>
+{/if}
 
 <!-- Screen Reflection on Desk -->
 <T.Mesh position={[0, 0.59, -2.0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -207,10 +210,10 @@
 </T.Mesh>
 
 <!-- Monitor Screen - Left monitor -->
-{#if $screenTexture}
+{#if $secondMonitorTexture}
 	<T.Mesh position={[-0.405, 0.84, -2.035]} rotation={[0, 1.047, 0]}>
 		<T.PlaneGeometry args={[0.45, 0.28]} />
-		<T.MeshBasicMaterial map={$screenTexture} toneMapped={false} />
+		<T.MeshBasicMaterial map={$secondMonitorTexture} toneMapped={false} />
 	</T.Mesh>
 {/if}
 
