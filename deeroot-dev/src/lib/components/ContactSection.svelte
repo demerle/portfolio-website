@@ -1,8 +1,8 @@
-<section id="contact" class="section">
+<section id="contact" class="section" aria-labelledby="contact-heading">
 	<div class="section-inner">
 		<div class="glass-card contact-card">
 			<p class="section-label">Contact</p>
-			<h2 class="contact-heading">Let’s build something together.</h2>
+			<h2 id="contact-heading" class="contact-heading">Let’s build something together.</h2>
 			<p class="contact-body">
 				I’m currently open to new opportunities and collaborations. If you have a project
 				in mind or just want to connect, reach out and I’ll get back to you.

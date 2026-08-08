@@ -1,33 +1,26 @@
 <script lang="ts">
-	import { fly, fade } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import ThreeBackground from './ThreeBackground.svelte';
-
-	let visible = $state(false);
-
-	$effect(() => {
-		visible = true;
-	});
 
 	function scrollToSection(id: string) {
 		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 	}
 </script>
 
-<section id="hero" class="relative min-h-screen w-full overflow-hidden">
+<section id="hero" class="relative min-h-screen w-full overflow-hidden" aria-labelledby="hero-heading">
 	<ThreeBackground />
 
 	<div class="hero-content">
-		{#if visible}
-			<div class="hero-grid">
+		<div class="hero-grid">
 				<!-- Name tile -->
 				<div
 					in:fly={{ y: 30, duration: 900, easing: quintOut }}
 					class="glass-card hero-tile name-tile"
 				>
 					<p class="hero-eyebrow">Portfolio</p>
-					<h1 class="hero-name">Daniel Emerle</h1>
-					<p class="hero-tagline">Developer & Creator</p>
+					<h1 id="hero-heading" class="hero-name">Daniel Emerle</h1>
+					<p class="hero-tagline">Developer • Creator • Piano Enthusiast</p>
 				</div>
 
 				<!-- Intro tile -->
@@ -107,7 +100,6 @@
 					</div>
 				</div>
 			</div>
-		{/if}
 	</div>
 </section>
 

@@ -1,7 +1,7 @@
-<section id="projects" class="section">
+<section id="projects" class="section" aria-labelledby="projects-heading">
 	<div class="section-inner">
 		<p class="section-label">Projects</p>
-		<h2 class="projects-heading">Selected work.</h2>
+		<h2 id="projects-heading" class="projects-heading">Selected work.</h2>
 
 		<div class="projects-grid">
 			{#each projects as project}
@@ -31,25 +31,20 @@
 <script lang="ts">
 	const projects = [
 		{
-			title: ' deeroot.dev',
+			title: 'deeroot.dev — Portfolio Website',
 			year: '2026',
-			description: 'A personal portfolio built with SvelteKit, Threlte, and Tailwind CSS, featuring an interactive 3D room background.',
-			tags: ['SvelteKit', 'Three.js', 'Tailwind'],
-			href: '#'
+			description:
+				'The personal portfolio of Daniel Emerle (deeroot): an interactive 3D experience built with SvelteKit, Threlte (Three.js), and Tailwind CSS, featuring a fully modeled piano room background.',
+			tags: ['SvelteKit', 'Three.js', 'Threlte', 'Tailwind'],
+			href: 'https://github.com/demerle/portfolio-website'
 		},
 		{
-			title: 'Project Alpha',
-			year: '2025',
-			description: 'A placeholder project card demonstrating the professional tile layout and interaction design.',
-			tags: ['TypeScript', 'Node.js', 'PostgreSQL'],
-			href: '#'
-		},
-		{
-			title: 'Project Beta',
-			year: '2024',
-			description: 'Another placeholder project showcasing responsive glassmorphism cards and clean typography.',
-			tags: ['React', 'Next.js', 'GraphQL'],
-			href: '#'
+			title: 'More projects on GitHub',
+			year: 'Ongoing',
+			description:
+				'Browse all of my public repositories, open-source experiments, and contributions on GitHub — from frontend tooling to backend services and everything in between.',
+			tags: ['Open Source', 'All Repos'],
+			href: 'https://github.com/demerle'
 		}
 	];
 </script>

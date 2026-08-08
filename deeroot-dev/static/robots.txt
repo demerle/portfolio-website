@@ -1,3 +1,9 @@
-# allow crawling everything by default
+# Allow all crawlers full access
 User-agent: *
+Allow: /
+
+# Block nothing; site is a single public page
 Disallow:
+
+# Sitemap
+Sitemap: https://deeroot.dev/sitemap.xml

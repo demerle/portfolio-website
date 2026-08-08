@@ -1,7 +1,7 @@
-<section id="skills" class="section">
+<section id="skills" class="section" aria-labelledby="skills-heading">
 	<div class="section-inner">
 		<p class="section-label">Skills</p>
-		<h2 class="skills-heading">Tools & technologies I work with.</h2>
+		<h2 id="skills-heading" class="skills-heading">Tools & technologies I work with.</h2>
 
 		<div class="skills-grid">
 			{#each skills as skill}

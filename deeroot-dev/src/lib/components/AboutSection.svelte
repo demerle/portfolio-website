@@ -1,13 +1,14 @@
-<section id="about" class="section">
+<section id="about" class="section" aria-labelledby="about-heading">
 	<div class="section-inner">
 		<div class="glass-card about-card">
 			<p class="section-label">About</p>
-			<h2 class="about-heading">Builder of thoughtful digital experiences.</h2>
+			<h2 id="about-heading" class="about-heading">Builder of thoughtful digital experiences.</h2>
 			<div class="about-body">
 				<p>
-					I’m a developer who cares about the space between engineering and design — where
-					performance, clarity, and craft meet. I enjoy turning complex problems into
-					interfaces that feel obvious in hindsight.
+					I’m Daniel Emerle — known online as <strong>deeroot</strong> — a developer who
+					cares about the space between engineering and design, where performance, clarity,
+					and craft meet. I enjoy turning complex problems into interfaces that feel
+					obvious in hindsight.
 				</p>
 				<p>
 					When I’m not writing code, I’m usually at the piano, exploring new tools, or

@@ -1,0 +1,8 @@
+
+> deeroot-dev@0.0.1 preview
+> vite preview --port 4178 --host
+
+  ➜  Local:   http://localhost:4178/
+  ➜  Network: http://100.100.31.105:4178/
+  ➜  Network: http://100.113.14.31:4178/
+  ➜  Network: http://172.18.0.1:4178/
