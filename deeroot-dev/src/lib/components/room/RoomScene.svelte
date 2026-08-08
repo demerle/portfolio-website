@@ -3,6 +3,8 @@
 	import { TextureLoader, DoubleSide } from 'three';
 	import SceneLighting from './SceneLighting.svelte';
 	import PianoKeyboard from './PianoKeyboard.svelte';
+	import PianoBenchSeat from './PianoBenchSeat.svelte';
+	import PianoBenchStand from './PianoBenchStand.svelte';
 	
 	// Breathing animation for character
 	let breatheOffset = $state(0);
@@ -595,6 +597,13 @@
 <!-- Full-size 88-key piano placed to the left of the desk. -->
 <T.Group position={[-1.28, 0.02, -2.1]} scale={0.84}>
 	<PianoKeyboard />
+</T.Group>
+
+<!-- ================= PIANO BENCH (4-leg stand + cushioned seat) ================= -->
+<!-- Centered on the piano, tucked up to the key fronts, at real-world scale. -->
+<T.Group position={[-1.28, 0, -1.8]}>
+	<PianoBenchStand />
+	<PianoBenchSeat />
 </T.Group>
 
 <!-- ================= CHAIR (Smaller, facing desk) ================= -->
