@@ -2,18 +2,25 @@
 	<div class="section-inner">
 		<div class="glass-card about-card">
 			<p class="section-label">About</p>
-			<h2 id="about-heading" class="about-heading">Builder of thoughtful digital experiences.</h2>
+			<h2 id="about-heading" class="about-heading">CS at NJIT, engineering in the real world.</h2>
 			<div class="about-body">
 				<p>
-					I’m Daniel Emerle — known online as <strong>deeroot</strong> — a developer who
-					cares about the space between engineering and design, where performance, clarity,
-					and craft meet. I enjoy turning complex problems into interfaces that feel
-					obvious in hindsight.
+					I'm Daniel Emerle, a Computer Science major (Business minor) at NJIT with a
+					3.8 GPA, graduating May 2027. Since January 2026, I've been a Software
+					Engineering Intern at <strong>Control Associates / Continua Process
+					Systems</strong>, where I work on the TakeoffAI project — using ML to extract
+					bid-estimate information from engineering drawings.
 				</p>
 				<p>
-					When I’m not writing code, I’m usually at the piano, exploring new tools, or
-					refining workflows. I believe the best products are built by people who are
-					curious about the whole stack.
+					There, I've shipped things like a YOLO classification pipeline (tuned from 75%
+					to 98% accuracy), a production TimescaleDB/Snowflake-schema data layer, an MCP
+					server that exposes model-training tooling to AI agents, and a full Ignition
+					Perspective UI rework.
+				</p>
+				<p>
+					Outside of work and class, I'm a TA for CS100 and I build music-tech tools —
+					pipelines that turn raw sheet-music PDFs into MusicXML, MIDI, and Synthesia
+					videos. I like working where data, backend systems, and automation meet.
 				</p>
 			</div>
 		</div>

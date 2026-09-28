@@ -7,9 +7,9 @@
 	const siteName = 'deeroot.dev';
 	const baseUrl = 'https://deeroot.dev';
 	const description =
-		'Daniel Emerle — developer, creator, and piano enthusiast (deeroot). Portfolio of Daniel Emerle: SvelteKit, Three.js, and thoughtful digital experiences at deeroot.dev.';
+		'Daniel Emerle — Computer Science student at NJIT (3.8 GPA) and Software Engineering Intern at Control Associates / Continua Process Systems. Python, Java, SQL, ML pipelines, and music-tech projects.';
 	const ogImage = `${baseUrl}/og.png`;
-	const title = 'Daniel Emerle — Developer, Creator & Piano Enthusiast | deeroot.dev';
+	const title = 'Daniel Emerle — CS Student & Software Engineering Intern | deeroot.dev';
 
 	const jsonLd = {
 		'@context': 'https://schema.org',
@@ -21,13 +21,18 @@
 				alternateName: 'deeroot',
 				url: baseUrl,
 				image: ogImage,
-				email: 'mailto:hello@deeroot.dev',
-				jobTitle: 'Developer & Creator',
+				email: 'mailto:danny.emerle@gmail.com',
+				telephone: '+1-609-367-4996',
+				jobTitle: 'CS Student & Software Engineering Intern',
+				alumniOf: {
+					'@type': 'CollegeOrUniversity',
+					name: 'New Jersey Institute of Technology'
+				},
 				description:
-					'Daniel Emerle (deeroot) is a developer and creator who builds thoughtful digital experiences with SvelteKit, Three.js, and a love of piano.',
+					'Daniel Emerle is a Computer Science student at NJIT and a Software Engineering Intern at Control Associates / Continua Process Systems, working on ML pipelines, IIoT data systems, and music-tech projects.',
 				sameAs: [
 					'https://github.com/demerle',
-					'https://linkedin.com/in/daniel-emerle'
+					'https://www.linkedin.com/in/danielemerle/'
 				]
 			},
 			{
@@ -58,7 +63,7 @@
 	<link rel="canonical" href={baseUrl} />
 	<title>{title}</title>
 	<meta name="description" content={description} />
-	<meta name="keywords" content="Daniel Emerle, deeroot, deeroot.dev, developer, creator, SvelteKit, Three.js, Threlte, portfolio, piano" />
+	<meta name="keywords" content="Daniel Emerle, deeroot, deeroot.dev, NJIT, Computer Science, Software Engineering Intern, Python, Java, PostgreSQL, Machine Learning, portfolio" />
 	<meta name="author" content="Daniel Emerle" />
 	<meta name="application-name" content={siteName} />
 	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />

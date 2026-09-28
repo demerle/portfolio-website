@@ -16,7 +16,7 @@
 							<span class="project-tag">{tag}</span>
 						{/each}
 					</div>
-					<a href={project.href} class="project-link">
+					<a href={project.href} class="project-link" target="_blank" rel="noopener noreferrer">
 						View project
 						<svg class="project-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -25,26 +25,65 @@
 				</div>
 			{/each}
 		</div>
+
+		<a href="https://github.com/demerle" target="_blank" rel="noopener noreferrer" class="projects-more-link">
+			See all 25+ repositories on GitHub
+			<svg class="project-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+			</svg>
+		</a>
 	</div>
 </section>
 
 <script lang="ts">
 	const projects = [
 		{
-			title: 'deeroot.dev — Portfolio Website',
+			title: 'Automated Sheet Music Pipeline',
 			year: '2026',
 			description:
-				'The personal portfolio of Daniel Emerle (deeroot): an interactive 3D experience built with SvelteKit, Threlte (Three.js), and Tailwind CSS, featuring a fully modeled piano room background.',
-			tags: ['SvelteKit', 'Three.js', 'Threlte', 'Tailwind'],
-			href: 'https://github.com/demerle/portfolio-website'
+				'Python pipeline converting raw sheet-music images/PDFs into MusicXML, then MIDI, then Synthesia videos — built on the HOMR optical music recognition model, with multi-page merging and continuous measure numbering.',
+			tags: ['Python', 'HOMR', 'OMR', 'MusicXML', 'MIDI'],
+			href: 'https://github.com/demerle/synthesia-bridge'
 		},
 		{
-			title: 'More projects on GitHub',
-			year: 'Ongoing',
+			title: 'Cloud-Native E-Commerce Store',
+			year: '2025',
 			description:
-				'Browse all of my public repositories, open-source experiments, and contributions on GitHub — from frontend tooling to backend services and everything in between.',
-			tags: ['Open Source', 'All Repos'],
-			href: 'https://github.com/demerle'
+				'Full-stack store with a secure Spring Boot REST API (15+ endpoints), React frontend with Stripe payments, deployed on AWS EC2 with Docker Compose and GitHub Actions CI/CD.',
+			tags: ['Spring Boot', 'React', 'AWS', 'Stripe', 'Docker'],
+			href: 'https://shop.deeroot.dev'
+		},
+		{
+			title: 'custom-llm',
+			year: '2026',
+			description:
+				'A minimal terminal LLM agent with native tool calling: local bash execution, web-search fallback, and optional stdio MCP server integration — kept deliberately small.',
+			tags: ['Python', 'LLM', 'MCP', 'Tool Calling'],
+			href: 'https://github.com/demerle/custom-llm'
+		},
+		{
+			title: 'realtime-translator',
+			year: '2026',
+			description:
+				'Voice conversation product built on OpenAI Realtime over WebRTC: Flutter mobile client, Python session/control API, short-lived credentials, and natural turn-taking.',
+			tags: ['Flutter', 'Python', 'WebRTC', 'OpenAI Realtime'],
+			href: 'https://github.com/demerle/realtime-translator'
+		},
+		{
+			title: 'deeroot-cards',
+			year: '2026',
+			description:
+				'A Unity/C# mod for the game Rounds — custom cards and stat logic built against UnboundLib, compiled and debugged in batch-mode Unity.',
+			tags: ['Unity', 'C#', 'Game Modding'],
+			href: 'https://github.com/demerle/deeroot-cards'
+		},
+		{
+			title: 'mahjong-calculator',
+			year: '2026',
+			description:
+				'Japanese riichi mahjong hand-payment calculator: Python scoring backend on the mahjong library with a React frontend.',
+			tags: ['Python', 'React', 'FastAPI'],
+			href: 'https://github.com/demerle/mahjong-calculator'
 		}
 	];
 </script>
@@ -62,6 +101,22 @@
 		display: grid;
 		grid-template-columns: 1fr;
 		gap: 1rem;
+	}
+
+	.projects-more-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--accent);
+		text-decoration: none;
+		margin-top: 1.75rem;
+		transition: gap 0.2s ease;
+	}
+
+	.projects-more-link:hover {
+		gap: 0.625rem;
 	}
 
 	.project-card {

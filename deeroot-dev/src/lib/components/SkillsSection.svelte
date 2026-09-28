@@ -1,12 +1,13 @@
 <section id="skills" class="section" aria-labelledby="skills-heading">
 	<div class="section-inner">
 		<p class="section-label">Skills</p>
-		<h2 id="skills-heading" class="skills-heading">Tools & technologies I work with.</h2>
+		<h2 id="skills-heading" class="skills-heading">Tools &amp; technologies I work with.</h2>
 
 		<div class="skills-grid">
-			{#each skills as skill}
+			{#each skillGroups as group}
 				<div class="glass-card skill-card">
-					<span class="skill-name">{skill}</span>
+					<h3 class="skill-category">{group.category}</h3>
+					<p class="skill-items">{group.items}</p>
 				</div>
 			{/each}
 		</div>
@@ -14,19 +15,23 @@
 </section>
 
 <script lang="ts">
-	const skills = [
-		'TypeScript',
-		'Svelte / SvelteKit',
-		'React',
-		'Next.js',
-		'Node.js',
-		'Tailwind CSS',
-		'PostgreSQL',
-		'GraphQL',
-		'Python',
-		'AWS',
-		'Docker',
-		'Figma'
+	const skillGroups = [
+		{
+			category: 'Languages',
+			items: 'Python, Java, JavaScript, SQL, C, Bash'
+		},
+		{
+			category: 'Frameworks & Libraries',
+			items: 'Spring Boot, FastAPI, React.js, Ultralytics YOLO'
+		},
+		{
+			category: 'Tools & Platforms',
+			items: 'AWS (EC2, RDS, S3), PostgreSQL, TimescaleDB, Docker / Docker Compose, Git, Linux'
+		},
+		{
+			category: 'AI & Agentic',
+			items: 'OpenAI Codex, OpenCode, Model Context Protocol (MCP)'
+		}
 	];
 </script>
 
@@ -46,26 +51,33 @@
 	}
 
 	.skill-card {
-		padding: 1rem 1.25rem;
+		padding: 1.5rem 1.25rem;
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
-	.skill-name {
+	.skill-category {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.skill-items {
 		font-size: 0.9375rem;
-		font-weight: 500;
+		line-height: 1.6;
 		color: var(--text-secondary);
 	}
 
-	.skill-card:hover .skill-name {
+	.skill-card:hover .skill-items {
 		color: var(--text-primary);
 	}
 
 	@media (min-width: 640px) {
 		.skills-grid {
-			grid-template-columns: repeat(3, 1fr);
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 
@@ -76,7 +88,7 @@
 		}
 
 		.skills-grid {
-			grid-template-columns: repeat(4, 1fr);
+			grid-template-columns: repeat(2, 1fr);
 			gap: 1rem;
 		}
 	}

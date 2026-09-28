@@ -5,7 +5,7 @@
 			<a href="https://github.com/demerle" target="_blank" rel="noopener noreferrer" class="footer-link">
 				GitHub
 			</a>
-			<a href="https://linkedin.com/in/daniel-emerle" target="_blank" rel="noopener noreferrer" class="footer-link">
+			<a href="https://www.linkedin.com/in/danielemerle/" target="_blank" rel="noopener noreferrer" class="footer-link">
 				LinkedIn
 			</a>
 		</div>

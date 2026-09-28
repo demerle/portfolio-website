@@ -2,22 +2,31 @@
 	<div class="section-inner">
 		<div class="glass-card contact-card">
 			<p class="section-label">Contact</p>
-			<h2 id="contact-heading" class="contact-heading">Let’s build something together.</h2>
+			<h2 id="contact-heading" class="contact-heading">Let's build something together.</h2>
 			<p class="contact-body">
-				I’m currently open to new opportunities and collaborations. If you have a project
-				in mind or just want to connect, reach out and I’ll get back to you.
+				I'm open to software engineering roles and internships. If you have a project in
+				mind or just want to connect, reach out and I'll get back to you.
 			</p>
 			<div class="contact-actions">
-				<a href="mailto:hello@deeroot.dev" class="btn btn-primary">hello@deeroot.dev</a>
+				<a href="mailto:danny.emerle@gmail.com" class="btn btn-primary">Email me</a>
 				<a
-					href="https://linkedin.com/in/daniel-emerle"
+					href="https://www.linkedin.com/in/danielemerle/"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="btn btn-secondary"
 				>
 					LinkedIn
 				</a>
+				<a
+					href="https://github.com/demerle"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="btn btn-secondary"
+				>
+					GitHub
+				</a>
 			</div>
+			<p class="contact-phone">609-367-4996</p>
 		</div>
 	</div>
 </section>
@@ -50,6 +59,13 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.75rem;
+	}
+
+	.contact-phone {
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: var(--text-muted);
+		margin-top: 1.25rem;
 	}
 
 	.btn {

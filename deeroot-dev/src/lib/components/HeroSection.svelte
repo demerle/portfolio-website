@@ -20,7 +20,7 @@
 				>
 					<p class="hero-eyebrow">Portfolio</p>
 					<h1 id="hero-heading" class="hero-name">Daniel Emerle</h1>
-					<p class="hero-tagline">Developer • Creator • Piano Enthusiast</p>
+					<p class="hero-tagline">CS Student • Software Engineering Intern • Music-Tech Builder</p>
 				</div>
 
 				<!-- Intro tile -->
@@ -29,9 +29,9 @@
 					class="glass-card hero-tile intro-tile"
 				>
 					<p class="hero-description">
-						I craft digital experiences that blend technical excellence with creative
-						expression. From writing clean code to playing piano melodies, I believe in
-						creating with passion and precision.
+						Computer Science major at NJIT with a software engineering internship at
+						Control Associates / Continua Process Systems — building ML pipelines,
+						IIoT data systems, and music-tech tools on the side.
 					</p>
 				</div>
 
@@ -74,7 +74,7 @@
 							</svg>
 						</a>
 						<a
-							href="https://linkedin.com/in/daniel-emerle"
+							href="https://www.linkedin.com/in/danielemerle/"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="social-link"
@@ -96,7 +96,7 @@
 				>
 					<div class="status-row">
 						<span class="status-dot"></span>
-						<span class="status-text">Open to opportunities</span>
+						<span class="status-text">Open to software engineering roles</span>
 					</div>
 				</div>
 			</div>
