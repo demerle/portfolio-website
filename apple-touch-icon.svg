@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+	<title>deeroot — Daniel Emerle</title>
+	<defs>
+		<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#0a0a1a" />
+			<stop offset="1" stop-color="#1a1a2e" />
+		</linearGradient>
+		<linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#4a90d9" />
+			<stop offset="1" stop-color="#6f6bff" />
+		</linearGradient>
+	</defs>
+	<rect width="180" height="180" rx="40" fill="url(#bg)" />
+	<path d="M60 44h34c23 0 40 18 40 41 0 25-20 45-46 45H60V44zm17 17v52h11c17 0 28-12 28-28 0-15-9-24-22-24h-17z" fill="url(#d)" />
+	<circle cx="126" cy="58" r="7" fill="#ff6b9d" />
+</svg>
