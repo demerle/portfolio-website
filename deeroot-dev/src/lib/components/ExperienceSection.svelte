@@ -1,11 +1,11 @@
 <section id="experience" class="section" aria-labelledby="experience-heading">
 	<div class="section-inner">
-		<p class="section-label">Experience</p>
-		<h2 id="experience-heading" class="experience-heading">Where I've worked.</h2>
+		<p class="section-eyebrow">My Experience</p>
+		<h2 id="experience-heading" class="section-heading">Where I've worked.</h2>
 
 		<div class="experience-list">
 			<!-- Featured internship -->
-			<article class="glass-card experience-card featured">
+			<article class="material-card experience-card featured">
 				<div class="experience-header">
 					<div>
 						<h3 class="experience-title">Software / System Engineering Intern</h3>
@@ -13,7 +13,7 @@
 							Control Associates / Continua Process Systems · Allendale, NJ
 						</p>
 					</div>
-					<p class="experience-dates">Jan 2026 – Aug 2026</p>
+					<span class="badge-chip">Jan 2026 – Aug 2026</span>
 				</div>
 				<ul class="experience-bullets">
 					<li>
@@ -51,13 +51,13 @@
 			</article>
 
 			<!-- Second tier -->
-			<article class="glass-card experience-card">
+			<article class="material-card experience-card">
 				<div class="experience-header">
 					<div>
 						<h3 class="experience-title">Teaching Assistant — CS100</h3>
 						<p class="experience-org">New Jersey Institute of Technology · Newark, NJ</p>
 					</div>
-					<p class="experience-dates">Sep 2024 – Present</p>
+					<span class="badge-chip">Sep 2024 – Present</span>
 				</div>
 				<p class="experience-summary">
 					Tutor students in Python fundamentals and hold full grading responsibility for
@@ -65,13 +65,13 @@
 				</p>
 			</article>
 
-			<article class="glass-card experience-card">
+			<article class="material-card experience-card">
 				<div class="experience-header">
 					<div>
 						<h3 class="experience-title">Office Administrator Intern</h3>
 						<p class="experience-org">Builders FirstSource · Berlin, NJ</p>
 					</div>
-					<p class="experience-dates">May 2024 – Sep 2024</p>
+					<span class="badge-chip">May 2024 – Sep 2024</span>
 				</div>
 				<p class="experience-summary">
 					Organized $500K+ in customer orders in Excel and maintained filing for 2,500+
@@ -87,26 +87,18 @@
 </section>
 
 <style>
-	.experience-heading {
-		font-size: 1.875rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		color: var(--text-primary);
-		margin-bottom: 2rem;
-	}
-
 	.experience-list {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 1.25rem;
 	}
 
 	.experience-card {
-		padding: 1.75rem;
+		padding: 2rem;
 	}
 
 	.experience-card.featured {
-		border-color: var(--glass-border-strong);
+		border-color: rgba(66, 165, 245, 0.25);
 	}
 
 	.experience-header {
@@ -114,13 +106,14 @@
 		flex-wrap: wrap;
 		align-items: baseline;
 		justify-content: space-between;
-		gap: 0.25rem 1rem;
-		margin-bottom: 1rem;
+		gap: 0.5rem 1rem;
+		margin-bottom: 1.25rem;
 	}
 
 	.experience-title {
 		font-size: 1.25rem;
-		font-weight: 700;
+		font-weight: 600;
+		letter-spacing: 0.5px;
 		color: var(--text-primary);
 	}
 
@@ -129,13 +122,6 @@
 		font-weight: 500;
 		color: var(--text-muted);
 		margin-top: 0.25rem;
-	}
-
-	.experience-dates {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--text-muted);
-		white-space: nowrap;
 	}
 
 	.experience-bullets {
@@ -147,7 +133,7 @@
 
 	.experience-bullets li {
 		font-size: 1rem;
-		line-height: 1.6;
+		line-height: 1.7;
 		color: var(--text-secondary);
 	}
 
@@ -158,7 +144,7 @@
 
 	.experience-summary {
 		font-size: 1rem;
-		line-height: 1.6;
+		line-height: 1.7;
 		color: var(--text-secondary);
 	}
 
@@ -166,27 +152,16 @@
 		font-size: 0.9375rem;
 		font-weight: 500;
 		color: var(--text-muted);
-		margin-top: 1.5rem;
+		margin-top: 2rem;
 	}
 
 	.experience-phone a {
-		color: var(--text-secondary);
+		color: var(--accent-soft);
 		text-decoration: none;
-		transition: color 0.2s ease;
+		transition: color 0.3s ease;
 	}
 
 	.experience-phone a:hover {
-		color: var(--accent);
-	}
-
-	@media (min-width: 768px) {
-		.experience-heading {
-			font-size: 2.5rem;
-			margin-bottom: 2.5rem;
-		}
-
-		.experience-card {
-			padding: 2.25rem;
-		}
+		color: #bbdefb;
 	}
 </style>

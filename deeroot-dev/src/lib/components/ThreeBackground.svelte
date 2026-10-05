@@ -34,10 +34,9 @@
 	});
 </script>
 
-<!-- Loading screen temporarily disabled for testing -->
-<!-- {#if loading}
+{#if loading && hasWebGL}
 	<LoadingScreen />
-{/if} -->
+{/if}
 
 {#if hasWebGL}
 	<div class="fixed inset-0" style="z-index: 0;">

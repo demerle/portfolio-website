@@ -1,263 +1,203 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+	import { browser } from '$app/environment';
 	import ThreeBackground from './ThreeBackground.svelte';
+
+	const roles = ['CS Student @ NJIT', 'Software Engineering Intern', 'Music-Tech Builder'];
+
+	let typedText = $state('');
+	let roleIndex = 0;
+	let charIndex = 0;
+	let deleting = false;
+
+	function tick() {
+		if (browser && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			typedText = roles[0]!;
+			return;
+		}
+		const role = roles[roleIndex]!;
+		if (deleting) {
+			charIndex--;
+		} else {
+			charIndex++;
+		}
+		typedText = role.slice(0, charIndex);
+
+		let delay: number;
+		if (!deleting && charIndex === role.length) {
+			delay = 2000;
+			deleting = true;
+		} else if (deleting && charIndex === 0) {
+			deleting = false;
+			roleIndex = (roleIndex + 1) % roles.length;
+			delay = 500;
+		} else {
+			delay = deleting ? 45 : 90;
+		}
+		window.setTimeout(tick, delay);
+	}
+
+	$effect(() => {
+		if (!browser) return;
+		const timeout = window.setTimeout(tick, 1200);
+		return () => window.clearTimeout(timeout);
+	});
 
 	function scrollToSection(id: string) {
 		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 	}
 </script>
 
-<section id="hero" class="relative min-h-screen w-full overflow-hidden" aria-labelledby="hero-heading">
+<section id="hero" class="hero" aria-labelledby="hero-heading">
 	<ThreeBackground />
 
 	<div class="hero-content">
-		<div class="hero-grid">
-				<!-- Name tile -->
-				<div
-					in:fly={{ y: 30, duration: 900, easing: quintOut }}
-					class="glass-card hero-tile name-tile"
-				>
-					<p class="hero-eyebrow">Portfolio</p>
-					<h1 id="hero-heading" class="hero-name">Daniel Emerle</h1>
-					<p class="hero-tagline">CS Student • Software Engineering Intern • Music-Tech Builder</p>
-				</div>
+		<p class="hero-eyebrow liquid-text-soft">Hello, I am</p>
+		<h1 id="hero-heading" class="hero-name liquid-text">Daniel Emerle</h1>
+		<p class="hero-typing" aria-live="polite">
+			<span class="typing-text">{typedText}</span><span class="typing-cursor">|</span>
+		</p>
 
-				<!-- Intro tile -->
-				<div
-					in:fly={{ y: 30, duration: 900, delay: 100, easing: quintOut }}
-					class="glass-card hero-tile intro-tile"
-				>
-					<p class="hero-description">
-						Computer Science major at NJIT with a software engineering internship at
-						Control Associates / Continua Process Systems — building ML pipelines,
-						IIoT data systems, and music-tech tools on the side.
-					</p>
-				</div>
+		<div class="hero-ctas">
+			<button onclick={() => scrollToSection('projects')} class="btn btn-primary">
+				View My Work
+			</button>
+			<a
+				href="https://github.com/demerle"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="btn btn-outline"
+			>
+				GitHub
+			</a>
+			<a
+				href="https://www.linkedin.com/in/danielemerle/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="btn btn-outline"
+			>
+				LinkedIn
+			</a>
+		</div>
 
-				<!-- CTA tile -->
-				<div
-					in:fly={{ y: 30, duration: 900, delay: 200, easing: quintOut }}
-					class="glass-card hero-tile cta-tile"
-				>
-					<div class="cta-content">
-						<p class="cta-label">Explore my work</p>
-						<div class="cta-buttons">
-							<button onclick={() => scrollToSection('projects')} class="btn btn-primary">
-								View Projects
-							</button>
-							<button onclick={() => scrollToSection('contact')} class="btn btn-secondary">
-								Get in Touch
-							</button>
-						</div>
-					</div>
-				</div>
-
-				<!-- Social tile -->
-				<div
-					in:fly={{ y: 30, duration: 900, delay: 300, easing: quintOut }}
-					class="glass-card hero-tile social-tile"
-				>
-					<p class="social-label">Connect</p>
-					<div class="social-links">
-						<a
-							href="https://github.com/demerle"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="social-link"
-							aria-label="GitHub"
-						>
-							<svg class="social-icon" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-								/>
-							</svg>
-						</a>
-						<a
-							href="https://www.linkedin.com/in/danielemerle/"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="social-link"
-							aria-label="LinkedIn"
-						>
-							<svg class="social-icon" fill="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-								/>
-							</svg>
-						</a>
-					</div>
-				</div>
-
-				<!-- Status tile -->
-				<div
-					in:fly={{ y: 30, duration: 900, delay: 400, easing: quintOut }}
-					class="glass-card hero-tile status-tile"
-				>
-					<div class="status-row">
-						<span class="status-dot"></span>
-						<span class="status-text">Open to software engineering roles</span>
-					</div>
-				</div>
-			</div>
+		<div class="hero-status">
+			<span class="status-dot"></span>
+			<span>Open to software engineering roles</span>
+		</div>
 	</div>
+
+	<a href="#about" class="scroll-indicator" aria-label="Scroll down">
+		<span class="scroll-mouse">
+			<span class="scroll-wheel"></span>
+		</span>
+		<span class="scroll-text">Scroll</span>
+	</a>
 </section>
 
 <style>
-	.hero-content {
+	.hero {
 		position: relative;
 		z-index: 10;
 		min-height: 100vh;
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		overflow: hidden;
+	}
+
+	/* Soft vignette for text legibility over the room */
+	.hero::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		background: radial-gradient(
+			ellipse 70% 55% at 50% 45%,
+			rgba(5, 5, 16, 0.45) 0%,
+			rgba(5, 5, 16, 0.15) 55%,
+			transparent 100%
+		);
+	}
+
+	.hero-content {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
 		padding: 6rem 1.5rem;
-	}
-
-	.hero-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 1rem;
-		width: 100%;
-		max-width: 56rem;
-	}
-
-	.hero-tile {
-		padding: 1.75rem;
+		max-width: 60rem;
 	}
 
 	.hero-eyebrow {
-		font-size: 0.75rem;
-		font-weight: 600;
-		letter-spacing: 0.15em;
+		font-size: 0.9375rem;
+		font-weight: 300;
+		letter-spacing: 5px;
 		text-transform: uppercase;
-		color: var(--accent);
 		margin-bottom: 1rem;
 	}
 
 	.hero-name {
-		font-size: 3rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		line-height: 1;
-		color: var(--text-primary);
-		margin-bottom: 0.75rem;
-		text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+		font-size: clamp(3rem, 9vw, 5.5rem);
+		font-weight: 700;
+		letter-spacing: 2px;
+		line-height: 1.05;
+		margin-bottom: 1.25rem;
 	}
 
-	.hero-tagline {
-		font-size: 1.125rem;
-		font-weight: 500;
-		color: var(--text-secondary);
-	}
-
-	.hero-description {
-		font-size: 1.125rem;
+	.hero-typing {
+		font-family: var(--font-mono);
+		font-size: 1.25rem;
 		font-weight: 400;
-		line-height: 1.7;
-		color: var(--text-secondary);
+		letter-spacing: 2px;
+		color: var(--accent-soft);
+		height: 2rem;
+		margin-bottom: 2.5rem;
 	}
 
-	.cta-content {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+	.typing-cursor {
+		animation: blink 1s step-end infinite;
+		color: var(--accent-bright);
 	}
 
-	.cta-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--text-muted);
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
 	}
 
-	.cta-buttons {
+	.hero-ctas {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
-	}
-
-	.btn {
-		padding: 0.75rem 1.5rem;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		border-radius: 12px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		border: 1px solid transparent;
-	}
-
-	.btn-primary {
-		background: var(--accent);
-		color: #0a0a1a;
-		border-color: var(--accent);
-	}
-
-	.btn-primary:hover {
-		background: #8cc5ff;
-		border-color: #8cc5ff;
-		transform: translateY(-1px);
-	}
-
-	.btn-secondary {
-		background: transparent;
-		color: var(--text-primary);
-		border-color: var(--glass-border-strong);
-	}
-
-	.btn-secondary:hover {
-		background: var(--glass-bg);
-		border-color: rgba(255, 255, 255, 0.2);
-		transform: translateY(-1px);
-	}
-
-	.social-label {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--text-muted);
-		margin-bottom: 1rem;
-	}
-
-	.social-links {
-		display: flex;
+		justify-content: center;
 		gap: 1rem;
 	}
 
-	.social-link {
+	.hero-status {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		width: 2.75rem;
-		height: 2.75rem;
+		gap: 0.625rem;
+		margin-top: 2.5rem;
+		padding: 0.625rem 1.25rem;
+		border-radius: 30px;
+		background: rgba(25, 118, 210, 0.1);
+		backdrop-filter: blur(12px) saturate(1.4);
+		-webkit-backdrop-filter: blur(12px) saturate(1.4);
+		border: 1px solid rgba(66, 165, 245, 0.2);
+		font-size: 0.875rem;
+		font-weight: 500;
+		letter-spacing: 0.5px;
 		color: var(--text-secondary);
-		background: var(--glass-bg);
-		border: 1px solid var(--glass-border);
-		border-radius: 12px;
-		transition: all 0.2s ease;
-	}
-
-	.social-link:hover {
-		color: var(--accent);
-		border-color: var(--accent);
-		transform: translateY(-2px);
-	}
-
-	.social-icon {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
-
-	.status-row {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
 	}
 
 	.status-dot {
 		width: 0.5rem;
 		height: 0.5rem;
-		background: var(--accent);
+		background: var(--accent-bright);
 		border-radius: 50%;
-		box-shadow: 0 0 10px var(--accent);
+		box-shadow: 0 0 10px var(--accent-bright);
 		animation: pulse 2s ease-in-out infinite;
 	}
 
@@ -271,56 +211,61 @@
 		}
 	}
 
-	.status-text {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--text-secondary);
+	/* Mouse-wheel scroll indicator */
+	.scroll-indicator {
+		position: absolute;
+		bottom: 2rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		text-decoration: none;
+		opacity: 0.7;
+		transition: opacity 0.3s ease;
 	}
 
-	@media (min-width: 768px) {
-		.hero-content {
-			padding: 8rem 2rem;
-		}
+	.scroll-indicator:hover {
+		opacity: 1;
+	}
 
-		.hero-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 1.25rem;
-		}
+	.scroll-mouse {
+		width: 24px;
+		height: 40px;
+		border: 2px solid #ffffff;
+		border-radius: 12px;
+		position: relative;
+	}
 
-		.hero-tile {
-			padding: 2.25rem;
-		}
+	.scroll-wheel {
+		width: 4px;
+		height: 8px;
+		background: #ffffff;
+		border-radius: 2px;
+		position: absolute;
+		top: 6px;
+		left: 50%;
+		transform: translateX(-50%);
+		animation: wheel 2s ease-in-out infinite;
+	}
 
-		.hero-name {
-			font-size: 4rem;
+	@keyframes wheel {
+		0% {
+			transform: translate(-50%, 0);
+			opacity: 1;
 		}
-
-		.name-tile {
-			grid-column: span 1;
-		}
-
-		.intro-tile {
-			grid-column: span 1;
-			display: flex;
-			align-items: center;
-		}
-
-		.cta-tile {
-			grid-column: span 1;
-		}
-
-		.social-tile {
-			grid-column: span 1;
-		}
-
-		.status-tile {
-			grid-column: span 2;
+		100% {
+			transform: translate(-50%, 15px);
+			opacity: 0;
 		}
 	}
 
-	@media (min-width: 1024px) {
-		.hero-name {
-			font-size: 4.5rem;
-		}
+	.scroll-text {
+		font-size: 0.75rem;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		color: #ffffff;
 	}
 </style>

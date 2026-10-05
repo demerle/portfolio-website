@@ -1,18 +1,51 @@
 <script lang="ts">
-	import { T, useTask, useLoader } from '@threlte/core';
-	import { TextureLoader, DoubleSide } from 'three';
+	import { T, useTask, useLoader, useThrelte } from '@threlte/core';
+	import { browser } from '$app/environment';
+	import { TextureLoader, DoubleSide, Vector2 } from 'three';
 	import SceneLighting from './SceneLighting.svelte';
+	import SpaceEnvironment from './SpaceEnvironment.svelte';
 	import PianoKeyboard from './PianoKeyboard.svelte';
 	import PianoBenchSeat from './PianoBenchSeat.svelte';
 	import PianoBenchStand from './PianoBenchStand.svelte';
-	
-	// Breathing animation for character
-	let breatheOffset = $state(0);
-	let time = $state(0);
+	import { createGlassMaterial, glassTime } from '$lib/three/glass';
+
+	// Glass shell materials — walls, floor, and seam glow
+	const wallGlass = createGlassMaterial({ color: '#8fc4ff', baseAlpha: 0.05, rimStrength: 0.5 });
+	const floorGlass = createGlassMaterial({ color: '#6ea8e8', baseAlpha: 0.09, rimStrength: 0.65 });
+
+	// ================= Mouse-parallax camera drift =================
+	const { camera } = useThrelte();
+	const pointerTarget = new Vector2(0, 0);
+	const pointerCurrent = new Vector2(0, 0);
+	let parallaxEnabled = false;
+
+	if (browser && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		parallaxEnabled = true;
+		window.addEventListener(
+			'pointermove',
+			(event) => {
+				pointerTarget.set(
+					(event.clientX / window.innerWidth) * 2 - 1,
+					(event.clientY / window.innerHeight) * 2 - 1
+				);
+			},
+			{ passive: true }
+		);
+	}
 
 	useTask((delta) => {
-		time += delta;
-		breatheOffset = Math.sin(time * 2) * 0.015;
+		// Shared glass twinkle clock
+		glassTime.value += delta;
+
+		// Ease the camera toward the pointer for a gentle parallax drift
+		if (parallaxEnabled) {
+			const ease = Math.min(1, delta * 3);
+			pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * ease;
+			pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * ease;
+			const cam = camera.current;
+			cam.position.set(pointerCurrent.x * 0.09, 1.4 - pointerCurrent.y * 0.05, 0);
+			cam.lookAt(0, 0.6, -2.2);
+		}
 	});
 
 	// Monitor screen textures
@@ -25,7 +58,7 @@
 	makeDefault
 	position={[0, 1.4, 0]}
 	near={0.1}
-	far={50}
+	far={80}
 	oncreate={(ref) => {
 		ref.lookAt(0, 0.6, -2.2);
 	}}
@@ -34,97 +67,92 @@
 <!-- Lighting -->
 <SceneLighting />
 
-<!-- ================= ROOM ENVIRONMENT (RECTANGULAR - SKINNY) ================= -->
-<!-- Room dimensions: 4m wide (back wall) x 5m deep (side walls) -->
+<!-- ================= SPACE ENVIRONMENT ================= -->
+<!-- Starfields, nebula dome, moon, shooting stars -->
+<SpaceEnvironment />
 
-<!-- Floor -->
-<T.Mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+<!-- ================= GLASS OBSERVATION DECK ================= -->
+<!-- Room dimensions: 4m wide x 5m deep x 3m tall. Solid surfaces replaced
+     with fresnel glass; stars and nebula show through every pane. -->
+
+<!-- Glass floor (stars visible beneath) -->
+<T.Mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} material={floorGlass}>
 	<T.PlaneGeometry args={[4, 5]} />
-	<T.MeshStandardMaterial color="#5c4033" roughness={0.6} metalness={0.05} />
 </T.Mesh>
 
-<!-- Floor planks -->
+<!-- Light seams where the floor planks used to be -->
 {#each Array(5) as _, i}
-	<T.Mesh position={[-1.8 + i * 0.9, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-		<T.PlaneGeometry args={[0.015, 5]} />
-		<T.MeshBasicMaterial color="#4a3328" />
+	<T.Mesh position={[-1.8 + i * 0.9, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+		<T.PlaneGeometry args={[0.012, 5]} />
+		<T.MeshBasicMaterial color="#2f6fce" transparent opacity={0.55} depthWrite={false} />
 	</T.Mesh>
 {/each}
 
-<!-- Back Wall (where desk goes) - SHORTER -->
-<T.Mesh position={[0, 1.5, -2.5]}>
-	<T.BoxGeometry args={[4, 3, 0.15]} />
-	<T.MeshStandardMaterial color="#4a4a6a" />
+<!-- Glass back wall (behind the desk) -->
+<T.Mesh position={[0, 1.5, -2.5]} material={wallGlass}>
+	<T.BoxGeometry args={[4, 3, 0.08]} />
 </T.Mesh>
 
-<!-- Left Wall (with window) - LONGER -->
-<T.Mesh position={[-2, 1.5, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[5, 3, 0.15]} />
-	<T.MeshStandardMaterial color="#404060" />
+<!-- Glass left wall -->
+<T.Mesh position={[-2, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} material={wallGlass}>
+	<T.BoxGeometry args={[5, 3, 0.08]} />
 </T.Mesh>
 
-<!-- Right Wall - LONGER -->
-<T.Mesh position={[2, 1.5, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[5, 3, 0.15]} />
-	<T.MeshStandardMaterial color="#404060" />
+<!-- Glass right wall -->
+<T.Mesh position={[2, 1.5, 0]} rotation={[0, Math.PI / 2, 0]} material={wallGlass}>
+	<T.BoxGeometry args={[5, 3, 0.08]} />
 </T.Mesh>
 
-<!-- Baseboards -->
-<T.Mesh position={[0, 0.05, -2.42]}>
-	<T.BoxGeometry args={[4, 0.1, 0.02]} />
-	<T.MeshStandardMaterial color="#3d3d50" />
+<!-- ================= NEON EDGE TRIM ================= -->
+<!-- Outlines the room silhouette in glowing Material Blue -->
+<!-- Bottom edges -->
+<T.Mesh position={[0, 0.02, -2.49]}>
+	<T.BoxGeometry args={[4, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
-<T.Mesh position={[-1.92, 0.05, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[5, 0.1, 0.02]} />
-	<T.MeshStandardMaterial color="#3d3d50" />
+<T.Mesh position={[-1.99, 0.02, 0]} rotation={[0, Math.PI / 2, 0]}>
+	<T.BoxGeometry args={[5, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
-
-<!-- ================= WINDOW ON LEFT WALL ================= -->
-<!-- Window Frame (outer) -->
-<T.Mesh position={[-1.92, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[2, 1.5, 0.08]} />
-	<T.MeshStandardMaterial color="#2a2a35" />
+<T.Mesh position={[1.99, 0.02, 0]} rotation={[0, Math.PI / 2, 0]}>
+	<T.BoxGeometry args={[5, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
-
-<!-- Window Glass -->
-<T.Mesh position={[-1.88, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.PlaneGeometry args={[1.8, 1.3]} />
-	<T.MeshBasicMaterial color="#1a1f2e" />
+<T.Mesh position={[0, 0.02, 2.49]}>
+	<T.BoxGeometry args={[4, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#1d5fb0" />
 </T.Mesh>
 
-<!-- Window cross frame (horizontal) -->
-<T.Mesh position={[-1.88, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[1.8, 0.05, 0.02]} />
-	<T.MeshStandardMaterial color="#2a2a35" />
+<!-- Top edges -->
+<T.Mesh position={[0, 2.98, -2.49]}>
+	<T.BoxGeometry args={[4, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
-<!-- Window cross frame (vertical) -->
-<T.Mesh position={[-1.88, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[0.05, 1.3, 0.02]} />
-	<T.MeshStandardMaterial color="#2a2a35" />
+<T.Mesh position={[-1.99, 2.98, 0]} rotation={[0, Math.PI / 2, 0]}>
+	<T.BoxGeometry args={[5, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
-
-<!-- Moon visible through window -->
-<T.Mesh position={[-1.85, 2.1, 0.3]} rotation={[0, Math.PI / 2, 0]}>
-	<T.CircleGeometry args={[0.12, 32]} />
-	<T.MeshBasicMaterial color="#fff8dc" />
+<T.Mesh position={[1.99, 2.98, 0]} rotation={[0, Math.PI / 2, 0]}>
+	<T.BoxGeometry args={[5, 0.02, 0.02]} />
+	<T.MeshBasicMaterial color="#42a5f5" />
 </T.Mesh>
 
-<!-- Stars through window -->
-{#each [
-	{x: -1.86, y: 1.5, z: -0.4}, {x: -1.86, y: 2.0, z: 0.5}, {x: -1.86, y: 2.2, z: -0.2},
-	{x: -1.86, y: 1.7, z: 0.3}, {x: -1.86, y: 1.9, z: -0.6}, {x: -1.86, y: 2.3, z: 0.1},
-	{x: -1.86, y: 1.6, z: 0.6}
-] as star}
-	<T.Mesh position={[star.x, star.y, star.z]} rotation={[0, Math.PI / 2, 0]}>
-		<T.CircleGeometry args={[0.012, 8]} />
-		<T.MeshBasicMaterial color="#ffffff" />
-	</T.Mesh>
-{/each}
-
-<!-- Window Sill -->
-<T.Mesh position={[-1.75, 1.05, 0]} rotation={[0, Math.PI / 2, 0]}>
-	<T.BoxGeometry args={[2.1, 0.06, 0.2]} />
-	<T.MeshStandardMaterial color="#5c4033" />
+<!-- Vertical corner edges -->
+<T.Mesh position={[-1.99, 1.5, -2.49]}>
+	<T.BoxGeometry args={[0.02, 3, 0.02]} />
+	<T.MeshBasicMaterial color="#90caf9" />
+</T.Mesh>
+<T.Mesh position={[1.99, 1.5, -2.49]}>
+	<T.BoxGeometry args={[0.02, 3, 0.02]} />
+	<T.MeshBasicMaterial color="#90caf9" />
+</T.Mesh>
+<T.Mesh position={[-1.99, 1.5, 2.49]}>
+	<T.BoxGeometry args={[0.02, 3, 0.02]} />
+	<T.MeshBasicMaterial color="#1d5fb0" />
+</T.Mesh>
+<T.Mesh position={[1.99, 1.5, 2.49]}>
+	<T.BoxGeometry args={[0.02, 3, 0.02]} />
+	<T.MeshBasicMaterial color="#1d5fb0" />
 </T.Mesh>
 
 <!-- ================= FURNITURE (Realistic Scale) ================= -->

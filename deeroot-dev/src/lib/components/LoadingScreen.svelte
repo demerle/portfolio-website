@@ -1,54 +1,82 @@
-<script lang="ts">
-	import { fly } from 'svelte/transition';
-</script>
-
-<div class="loading-screen" transition:fly={{ y: -50, duration: 500 }}>
-		<div class="piano-loader">
-			{#each Array(5) as _, i}
-				<div class="key" style="animation-delay: {i * 0.1}s"></div>
-			{/each}
-		</div>
-		<p class="text-white/70 text-lg">Loading Experience...</p>
+<div class="loading-screen" aria-hidden="true">
+	<div class="pl">
+		{#each Array(12) as _, i}
+			<div class="pl-dot" style="animation-delay: -{i * 0.1666667}s"></div>
+		{/each}
+		<p class="pl-text">Loading</p>
+	</div>
 </div>
 
 <style>
 	.loading-screen {
 		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
-		background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+		inset: 0;
+		z-index: 9999;
+		background: var(--bg-elevated);
 		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		z-index: 9999;
+		opacity: 1;
+		transition: opacity 0.8s ease 0.4s;
 	}
 
-	.piano-loader {
+	.pl {
+		position: relative;
+		width: 20em;
+		height: 20em;
 		display: flex;
-		gap: 4px;
-		margin-bottom: 20px;
+		justify-content: center;
+		align-items: center;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		transform: rotateX(30deg) rotateZ(45deg);
+		color: #ffffff;
+		font-size: 16px;
+		box-shadow:
+			2em 0 2em rgba(0, 0, 0, 0.2) inset,
+			-2em 0 2em rgba(255, 255, 255, 0.1) inset;
 	}
 
-	.key {
-		width: 12px;
-		height: 40px;
-		background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
-		border-radius: 2px;
-		animation: keyPress 0.8s ease-in-out infinite;
+	.pl,
+	.pl-dot {
+		border-radius: 50%;
 	}
 
-	@keyframes keyPress {
-		0%,
-		100% {
-			transform: translateY(0);
-			background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+	.pl-dot {
+		position: absolute;
+		top: calc(50% - 0.75em);
+		left: calc(50% - 0.75em);
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 50%;
+		box-shadow:
+			0.1em 0.1em 0 0.1em rgba(0, 0, 0, 0.2),
+			0.3em 0 0.3em rgba(0, 0, 0, 0.3);
+		animation: orbit 2s linear infinite;
+	}
+
+	.pl-text {
+		position: absolute;
+		font-size: 0.75em;
+		max-width: 5rem;
+		text-shadow: 0 0 0.1em rgba(255, 255, 255, 0.5);
+		transform: rotateZ(-45deg);
+	}
+
+	@keyframes orbit {
+		from {
+			transform: rotate(0deg) translateX(7em) rotate(0deg);
+			animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
 		}
-		50% {
-			transform: translateY(10px);
-			background: #4a90d9;
+		to {
+			transform: rotate(-360deg) translateX(7em) rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pl-dot {
+			animation: none;
+			transform: rotate(0deg) translateX(7em) rotate(0deg);
 		}
 	}
 </style>

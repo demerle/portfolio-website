@@ -67,7 +67,7 @@
 	<meta name="author" content="Daniel Emerle" />
 	<meta name="application-name" content={siteName} />
 	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-	<meta name="theme-color" content="#0a0a1a" />
+	<meta name="theme-color" content="#191919" />
 
 	<!-- Open Graph -->
 	<meta property="og:type" content="profile" />
