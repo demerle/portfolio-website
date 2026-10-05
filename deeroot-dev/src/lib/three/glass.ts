@@ -1,9 +1,9 @@
 /**
  * Fresnel "starry glass" material for the room shell.
  *
- * Nearly invisible face-on, glowing rim at grazing angles, with tiny
- * twinkling star speckles embedded in the surface — so walls read as thin
- * glass panes floating in space rather than solid geometry.
+ * Nearly invisible face-on, glowing rim at grazing angles — so walls read
+ * as thin glass panes floating in space rather than solid geometry. The
+ * actual stars live in SpaceEnvironment.svelte, not in this material.
  */
 
 import * as THREE from 'three';
@@ -27,14 +27,8 @@ const glassFragment = /* glsl */ `
 	uniform float uRimPower;
 	uniform float uRimStrength;
 	uniform float uBaseAlpha;
-	uniform float uTime;
-	uniform float uSparkles;
 	varying vec3 vWorldPos;
 	varying vec3 vNormal;
-
-	float hash(vec2 p) {
-		return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-	}
 
 	void main() {
 		vec3 viewDir = normalize(cameraPosition - vWorldPos);
@@ -45,16 +39,6 @@ const glassFragment = /* glsl */ `
 
 		vec3 color = uColor * (0.35 + 1.4 * fresnel);
 		float alpha = uBaseAlpha + uRimStrength * fresnel;
-
-		// Embedded star speckles twinkling over time
-		if (uSparkles > 0.5) {
-			vec2 cell = floor(vec2(vWorldPos.x + vWorldPos.z, vWorldPos.y - vWorldPos.z) * 60.0);
-			float h = hash(cell);
-			float twinkle = 0.5 + 0.5 * sin(uTime * 1.4 + h * 6.2831853);
-			float sparkle = step(0.986, h) * twinkle;
-			color += vec3(0.8, 0.9, 1.0) * sparkle * 0.9;
-			alpha = max(alpha, sparkle * 0.85);
-		}
 
 		gl_FragColor = vec4(color, alpha);
 		#include <tonemapping_fragment>
@@ -67,20 +51,10 @@ export interface GlassOptions {
 	rimPower?: number;
 	rimStrength?: number;
 	baseAlpha?: number;
-	sparkles?: boolean;
 }
 
-/** Shared clock uniform so all glass surfaces twinkle in sync. */
-export const glassTime = { value: 0 };
-
 export function createGlassMaterial(options: GlassOptions = {}): THREE.ShaderMaterial {
-	const {
-		color = '#8fc4ff',
-		rimPower = 2.6,
-		rimStrength = 0.5,
-		baseAlpha = 0.06,
-		sparkles = true
-	} = options;
+	const { color = '#8fc4ff', rimPower = 2.6, rimStrength = 0.5, baseAlpha = 0.06 } = options;
 
 	return new THREE.ShaderMaterial({
 		vertexShader: glassVertex,
@@ -89,9 +63,7 @@ export function createGlassMaterial(options: GlassOptions = {}): THREE.ShaderMat
 			uColor: { value: new THREE.Color(color) },
 			uRimPower: { value: rimPower },
 			uRimStrength: { value: rimStrength },
-			uBaseAlpha: { value: baseAlpha },
-			uTime: glassTime,
-			uSparkles: { value: sparkles ? 1 : 0 }
+			uBaseAlpha: { value: baseAlpha }
 		},
 		transparent: true,
 		depthWrite: false,

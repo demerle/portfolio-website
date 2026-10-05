@@ -7,7 +7,7 @@
 	import PianoKeyboard from './PianoKeyboard.svelte';
 	import PianoBenchSeat from './PianoBenchSeat.svelte';
 	import PianoBenchStand from './PianoBenchStand.svelte';
-	import { createGlassMaterial, glassTime } from '$lib/three/glass';
+	import { createGlassMaterial } from '$lib/three/glass';
 
 	// Glass shell materials — walls, floor, and seam glow
 	const wallGlass = createGlassMaterial({ color: '#8fc4ff', baseAlpha: 0.05, rimStrength: 0.5 });
@@ -34,9 +34,6 @@
 	}
 
 	useTask((delta) => {
-		// Shared glass twinkle clock
-		glassTime.value += delta;
-
 		// Ease the camera toward the pointer for a gentle parallax drift
 		if (parallaxEnabled) {
 			const ease = Math.min(1, delta * 3);
