@@ -7,40 +7,28 @@
 	const { renderer, scene, camera, size, dpr } = useThrelte();
 
 	let pass: WaterRipplePass | null = $state(null);
-	let heroActive = $state(true);
 	let reducedMotion = false;
 
-	// Pointer state for interactive drops
-	let lastX = -1;
-	let lastY = -1;
-
 	function onPointerMove(event: PointerEvent) {
+		// jquery.ripples behavior: a small drop on every move event
 		if (!pass?.active) return;
-		const x = event.clientX / window.innerWidth;
-		const y = 1 - event.clientY / window.innerHeight;
-		if (lastX >= 0) {
-			const dist = Math.hypot(x - lastX, y - lastY);
-			if (dist > 0.004) {
-				pass.addDrop(x, y, 0.04, Math.min(0.02, 0.005 + dist * 1.4));
-			}
-		}
-		lastX = x;
-		lastY = y;
+		pass.addDrop(
+			event.clientX / window.innerWidth,
+			1 - event.clientY / window.innerHeight,
+			20 / Math.max(window.innerWidth, window.innerHeight),
+			0.01
+		);
 	}
 
 	function onPointerDown(event: PointerEvent) {
+		// ...and only a bigger ripple on press
 		if (!pass?.active) return;
-		const x = event.clientX / window.innerWidth;
-		const y = 1 - event.clientY / window.innerHeight;
-		pass.addDrop(x, y, 0.055, 0.12);
-	}
-
-	function onScroll() {
-		heroActive = window.scrollY < window.innerHeight * 0.85;
-		if (!heroActive) {
-			lastX = -1;
-			lastY = -1;
-		}
+		pass.addDrop(
+			event.clientX / window.innerWidth,
+			1 - event.clientY / window.innerHeight,
+			(20 / Math.max(window.innerWidth, window.innerHeight)) * 1.5,
+			0.14
+		);
 	}
 
 	onMount(() => {
@@ -51,13 +39,10 @@
 
 		window.addEventListener('pointermove', onPointerMove, { passive: true });
 		window.addEventListener('pointerdown', onPointerDown, { passive: true });
-		window.addEventListener('scroll', onScroll, { passive: true });
-		onScroll();
 
 		return () => {
 			window.removeEventListener('pointermove', onPointerMove);
 			window.removeEventListener('pointerdown', onPointerDown);
-			window.removeEventListener('scroll', onScroll);
 			pass?.dispose();
 			pass = null;
 		};
@@ -71,8 +56,8 @@
 	});
 
 	useTask((delta) => {
-		if (!pass) return;
-		pass.active = heroActive && !reducedMotion;
+		if (!pass || document.hidden) return;
+		pass.active = !reducedMotion;
 		pass.step(delta);
 		pass.render(scene, camera.current);
 	});

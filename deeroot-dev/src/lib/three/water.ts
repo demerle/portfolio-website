@@ -48,10 +48,8 @@ const simFragment = /* glsl */ `
 		) * 0.25;
 
 		info.g += (average - info.r) * 2.0;
-		info.g *= 0.992; // damping
+		info.g *= 0.995; // damping (matches jquery.ripples)
 		info.r += info.g;
-		info.r = clamp(info.r, -0.25, 0.25);
-		info.g = clamp(info.g, -0.25, 0.25);
 
 		// Inject drops queued this frame
 		for (int i = 0; i < ${MAX_DROPS_PER_FRAME}; i++) {
@@ -61,6 +59,11 @@ const simFragment = /* glsl */ `
 			drop = 0.5 - cos(drop * 3.14159265) * 0.5;
 			info.r += drop * d.w;
 		}
+
+		// Safety clamps only — the reference has none, these never fire in
+		// normal operation but stop runaway blow-ups (half-float buffers).
+		info.r = clamp(info.r, -0.5, 0.5);
+		info.g = clamp(info.g, -0.5, 0.5);
 
 		gl_FragColor = info;
 	}
@@ -72,26 +75,29 @@ const compositeFragment = /* glsl */ `
 	uniform sampler2D uScene;
 	uniform sampler2D uWater;
 	uniform vec2 uDelta;
-	uniform float uStrength;
+	uniform float uPerturbance;
 	varying vec2 vUv;
 
 	void main() {
-		float hL = texture2D(uWater, vUv - vec2(uDelta.x, 0.0)).r;
-		float hR = texture2D(uWater, vUv + vec2(uDelta.x, 0.0)).r;
-		float hD = texture2D(uWater, vUv - vec2(0.0, uDelta.y)).r;
-		float hU = texture2D(uWater, vUv + vec2(0.0, uDelta.y)).r;
+		// Surface normal from one-sided height derivatives — the same math as
+		// the jquery.ripples render shader. The cross of the two surface
+		// slant vectors yields a unit normal; its xz components drive both
+		// refraction and shading.
+		float height = texture2D(uWater, vUv).r;
+		float heightX = texture2D(uWater, vec2(vUv.x + uDelta.x, vUv.y)).r;
+		float heightY = texture2D(uWater, vec2(vUv.x, vUv.y + uDelta.y)).r;
+		vec3 dx = vec3(uDelta.x, heightX - height, 0.0);
+		vec3 dy = vec3(0.0, heightY - height, uDelta.y);
+		vec2 offset = -normalize(cross(dy, dx)).xz;
 
-		// Surface normal from height gradient
-		vec3 n = normalize(vec3(hL - hR, hD - hU, 0.6));
+		// Signature wavefront glint: a white plus whose intensity peaks where
+		// the surface normal aligns with the fixed light direction. The
+		// original adds it in display space (max 1.0); here it lands in linear
+		// space and the tone mapping keeps it within range.
+		float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0);
 
 		// Refraction of the underlying scene (linear working space)
-		vec2 distortion = n.xy * uStrength;
-		vec3 color = texture2D(uScene, vUv + distortion).rgb;
-
-		// Subtle specular shimmer
-		vec3 lightDir = normalize(vec3(0.35, 0.55, 0.75));
-		float spec = pow(max(dot(n, lightDir), 0.0), 48.0);
-		color += vec3(0.7, 0.85, 1.0) * spec * 0.10;
+		vec3 color = texture2D(uScene, vUv + offset * uPerturbance).rgb + specular;
 
 		gl_FragColor = vec4(color, 1.0);
 		// Tone mapping + encoding happen here: three.js skips them when a
@@ -99,7 +105,6 @@ const compositeFragment = /* glsl */ `
 		// screen — so this restores the exact same look as a direct render.
 		#include <tonemapping_fragment>
 		#include <colorspace_fragment>
-
 	}
 `;
 
@@ -140,7 +145,8 @@ export class WaterRipplePass {
 
 	/** When false the scene renders straight to screen (no water). */
 	active = true;
-	strength = 0.022;
+	/** UV-space refraction amount (jquery.ripples calls this `perturbance`). */
+	perturbance = 0.03;
 
 	constructor(renderer: THREE.WebGLRenderer) {
 		this.renderer = renderer;
@@ -202,7 +208,7 @@ export class WaterRipplePass {
 				uScene: { value: this.sceneRT.texture },
 				uWater: { value: this.simA.texture },
 				uDelta: { value: new THREE.Vector2(1 / SIM_SIZE, 1 / SIM_SIZE) },
-				uStrength: { value: this.strength }
+				uPerturbance: { value: this.perturbance }
 			},
 			depthTest: false,
 			depthWrite: false
@@ -226,16 +232,16 @@ export class WaterRipplePass {
 		if (!this.active) return;
 
 		// Occasional ambient drop so the water is never fully still
-		
+		// (subtle: the reference has none, but a dead-flat hero feels inert)
 		this.ambientTimer -= delta;
 		if (this.ambientTimer <= 0) {
 			this.queue.push({
 				x: Math.random(),
 				y: Math.random(),
-				radius: 0.025 + Math.random() * 0.02,
-				strength: 0.025 + Math.random() * 0.04
+				radius: 0.015 + Math.random() * 0.02,
+				strength: 0.012 + Math.random() * 0.018
 			});
-			this.ambientTimer = 2.0 + Math.random() * 3.0;
+			this.ambientTimer = 3.0 + Math.random() * 4.0;
 		}
 
 		// Write up to N queued drops into uniforms
@@ -273,13 +279,13 @@ export class WaterRipplePass {
 
 		this.outMaterial.uniforms.uScene.value = this.sceneRT.texture;
 		this.outMaterial.uniforms.uWater.value = this.simA.texture;
-		this.outMaterial.uniforms.uStrength.value = this.strength;
+		this.outMaterial.uniforms.uPerturbance.value = this.perturbance;
 
 		this.renderer.setRenderTarget(null);
 		this.renderer.render(this.outScene, this.outCamera);
 	}
 
-		dispose(): void {
+	dispose(): void {
 		this.simA.dispose();
 		this.simB.dispose();
 		this.sceneRT.dispose();
