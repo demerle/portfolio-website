@@ -93,8 +93,9 @@ const compositeFragment = /* glsl */ `
 		// Signature wavefront glint: a white plus whose intensity peaks where
 		// the surface normal aligns with the fixed light direction. The
 		// original adds it in display space (max 1.0); here it lands in linear
-		// space and the tone mapping keeps it within range.
-		float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0);
+		// space and the tone mapping keeps it within range. Scaled ×0.7 — the
+		// literal port read slightly hot on this dark scene.
+		float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0) * 0.7;
 
 		// Refraction of the underlying scene (linear working space)
 		vec3 color = texture2D(uScene, vUv + offset * uPerturbance).rgb + specular;
