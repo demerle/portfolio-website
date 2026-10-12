@@ -74,7 +74,7 @@
 		</h2>
 
 		<div class="about-grid">
-			<div class="about-bio">
+			<div class="about-bio material-card">
 				<p>
 					I'm Daniel Emerle, a Computer Science major (Business minor) at NJIT with a
 					3.8 GPA, graduating May 2027. Since January 2026, I've been a Software
@@ -141,6 +141,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		padding: 2rem;
+	}
+
+	/* Static text card — no hover lift/edge like interactive cards */
+	.about-bio:hover {
+		background: var(--surface-gradient);
+		box-shadow: var(--shadow-card);
+		transform: none;
+	}
+
+	.about-bio:hover::before {
+		opacity: 0;
 	}
 
 	.about-bio p {

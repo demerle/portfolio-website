@@ -2,7 +2,7 @@
 	<div class="section-inner">
 		<p class="section-eyebrow">Reach out to me</p>
 		<h2 id="contact-heading" class="section-heading">Let's work together!</h2>
-		<p class="contact-body">
+		<p class="contact-body material-card">
 			I'm open to software engineering roles and internships. If you have a project in
 			mind or just want to connect, reach out and I'll get back to you.
 		</p>
@@ -102,6 +102,18 @@
 		color: var(--text-secondary);
 		max-width: 42rem;
 		margin-bottom: 2.5rem;
+		padding: 1.75rem;
+	}
+
+	/* Static text card — no hover lift/edge like interactive cards */
+	.contact-body:hover {
+		background: var(--surface-gradient);
+		box-shadow: var(--shadow-card);
+		transform: none;
+	}
+
+	.contact-body:hover::before {
+		opacity: 0;
 	}
 
 	.contact-actions {
