@@ -52,19 +52,33 @@
 		}
 	];
 
-	const AUTOPLAY_MS = 4500;
 	const SETTLE_MS = 200;
 	const SETTLE_MAX_MS = 1200;
 
 	let track: HTMLDivElement | null = $state(null);
-	let activeIndex = $state(0);
-	let paused = $state(false);
+	let activeIndex = $state(0); // real project index (0..projects.length-1)
+	let hoverIdx = $state<number | null>(null); // index within the rendered (cloned) list
 
 	// While a programmatic scroll is in flight, scroll-derived index updates are
 	// suppressed so the highlight doesn't cascade through intermediate slides.
 	let programmatic = false;
 	let settleTimer = 0;
 	let scrollRaf = 0;
+
+	const n = projects.length;
+	// [twin of last, ...real projects..., twin of first] — makes the carousel
+	// seamlessly circular. The twins let prev/next scroll off the edges in the
+	// correct direction; once the scroll settles on a twin, the view silently
+	// jumps (identical content, invisible swap) to the corresponding real slide.
+	const slidesList = [
+		{ ...projects[n - 1], clone: true },
+		...projects.map((p) => ({ ...p, clone: false })),
+		{ ...projects[0], clone: true }
+	];
+
+	function isClone(idx: number): boolean {
+		return idx === 0 || idx === slidesList.length - 1;
+	}
 
 	function slides(): HTMLElement[] {
 		if (!track) return [];
@@ -79,9 +93,13 @@
 		return slide.offsetLeft - (track?.offsetLeft ?? 0);
 	}
 
-	function nearestIndex(): number {
+	function realIndex(cloneIdx: number): number {
+		return (((cloneIdx - 1) % n) + n) % n;
+	}
+
+	function nearestClone(): number | null {
 		const list = slides();
-		if (!track || list.length === 0) return activeIndex;
+		if (!track || list.length === 0) return null;
 		const viewportCenter = track.scrollLeft + track.clientWidth / 2;
 		let best = 0;
 		let bestDist = Infinity;
@@ -107,38 +125,110 @@
 		clearSettle();
 		settleTimer = window.setTimeout(() => {
 			settleTimer = 0;
-			if (programmatic) {
-				programmatic = false;
-				activeIndex = nearestIndex();
-			}
+			resolveSettle();
 		}, delay);
 	}
 
-	// Single scroll entry point used by arrows, dots and autoplay. Scrolls the
-	// target slide's center to the track's viewport center (the browser clamps
-	// the edges, so first/last slides rest on their boundaries).
-	function scrollToSlide(index: number) {
+	// A scroll has fully stopped (event-quiet or `scrollend`): hand the
+	// highlight back to scroll-derived tracking and unwrap any twin resting at
+	// the viewport center.
+	function resolveSettle() {
+		clearSettle();
+		programmatic = false;
+		const clone = nearestClone();
+		if (clone !== null) activeIndex = realIndex(clone);
+		normalizeTwins();
+	}
+
+	// If the settled position is an edge twin, silently re-center on the real
+	// slide it duplicates — nothing visibly moves, and the spotlight/dots then
+	// track the real slide.
+	function normalizeTwins() {
+		const clone = nearestClone();
+		if (clone === 0) {
+			programmatic = true;
+			activeIndex = n - 1;
+			armSettle(SETTLE_MAX_MS);
+			centerClone(n, 'auto');
+		} else if (clone === slidesList.length - 1) {
+			programmatic = true;
+			activeIndex = 0;
+			armSettle(SETTLE_MAX_MS);
+			centerClone(1, 'auto');
+		}
+	}
+
+	// Horizontal scroll position that centers the given rendered slide.
+	function centerClone(cloneIdx: number, behavior: ScrollBehavior) {
 		if (!track) return;
 		const list = slides();
-		const target = (index + projects.length) % projects.length;
-		const slide = list[target];
+		const slide = list[cloneIdx];
 		if (!slide) return;
 		const left = slideLeft(slide) - (track.clientWidth - slide.offsetWidth) / 2;
+		track.scrollTo({ left, behavior });
+	}
+
+	// Single scroll entry point used by arrows and dots.
+	function scrollToProject(index: number) {
+		if (!track) return;
+		const target = ((index % n) + n) % n;
+		// Wraps scroll onto the spatial twin beyond the edge so the track moves
+		// in the direction the user asked for; resolveSettle() swaps it for the
+		// real slide once the scroll stops.
+		const twin = index < 0 ? 0 : index >= n ? n + 1 : target + 1;
 		programmatic = true;
 		activeIndex = target;
 		// Bound the suppression in case no scroll events fire (e.g. instant scroll);
 		// scrollend (below) or per-event re-arming settles it sooner.
 		armSettle(SETTLE_MAX_MS);
-		track.scrollTo({ left, behavior: 'smooth' });
+		centerClone(twin, 'smooth');
 	}
 
 	function next() {
-		scrollToSlide(activeIndex + 1);
+		scrollToProject(activeIndex + 1);
 	}
 
 	function prev() {
-		scrollToSlide(activeIndex - 1);
+		scrollToProject(activeIndex - 1);
 	}
+
+	// Hover takes priority over the scroll position: exactly one spotlit card
+	// at any time, whichever the pointer (or keyboard focus) is over.
+	function handleTrackOver(event: MouseEvent) {
+		const slide = (event.target as HTMLElement).closest?.('.project-slide') as HTMLElement | null;
+		hoverIdx = slide ? Number(slide.dataset.clone) : null;
+	}
+
+	function handleTrackLeave() {
+		hoverIdx = null;
+	}
+
+	function handleFocusIn(event: FocusEvent) {
+		const slide = (event.target as HTMLElement).closest?.('.project-slide') as HTMLElement | null;
+		if (slide) hoverIdx = Number(slide.dataset.clone);
+	}
+
+	function handleFocusOut(event: FocusEvent) {
+		// Only clear when focus left the track entirely, not when it moved to a
+		// sibling slide's link.
+		const to = event.relatedTarget as HTMLElement | null;
+		if (!to || !to.closest?.('.project-slide')) hoverIdx = null;
+	}
+
+	$effect(() => {
+		if (!browser || !track) return;
+		const el = track;
+		el.addEventListener('mouseover', handleTrackOver);
+		el.addEventListener('mouseleave', handleTrackLeave);
+		el.addEventListener('focusin', handleFocusIn);
+		el.addEventListener('focusout', handleFocusOut);
+		return () => {
+			el.removeEventListener('mouseover', handleTrackOver);
+			el.removeEventListener('mouseleave', handleTrackLeave);
+			el.removeEventListener('focusin', handleFocusIn);
+			el.removeEventListener('focusout', handleFocusOut);
+		};
+	});
 
 	function handleScroll() {
 		if (!track) return;
@@ -152,52 +242,29 @@
 		if (scrollRaf !== 0) window.cancelAnimationFrame(scrollRaf);
 		scrollRaf = window.requestAnimationFrame(() => {
 			scrollRaf = 0;
-			activeIndex = nearestIndex();
+			const clone = nearestClone();
+			if (clone !== null) activeIndex = realIndex(clone);
 		});
 	}
 
-	// Autoplay — pauses on hover, touch, or focus
-	$effect(() => {
-		if (!browser || reducedAutoplay()) return;
-		const interval = window.setInterval(() => {
-			if (!paused && track && document.visibilityState === 'visible') next();
-		}, AUTOPLAY_MS);
-		return () => window.clearInterval(interval);
-	});
-
-	function reducedAutoplay(): boolean {
-		return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-	}
-
-	// Center the first slide on load so the muted/spotlight states match the view.
+	// Base view: center the first real project instantly (no motion), so the
+	// twin of the last project peeks in on the left.
 	$effect(() => {
 		if (!browser || !track) return;
-		const slide = slides()[0];
-		if (!slide) return;
 		programmatic = true;
 		clearSettle();
-		track.scrollTo({
-			left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
-			behavior: 'auto'
-		});
+		centerClone(1, 'auto');
 		armSettle(SETTLE_MAX_MS);
 	});
 
 	// `scrollend` fires once the scroll (including mandatory snap adjustment) has
-	// fully stopped — the earliest reliable moment to hand the highlight back to
-	// scroll-derived tracking.
+	// fully stopped — the earliest reliable moment to unwrap twins and hand the
+	// highlight back to scroll-derived tracking.
 	$effect(() => {
 		if (!browser || !track) return;
-		const onSettle = () => {
-			clearSettle();
-			if (programmatic) {
-				programmatic = false;
-				activeIndex = nearestIndex();
-			}
-		};
-		track.addEventListener('scrollend', onSettle);
+		track.addEventListener('scrollend', resolveSettle);
 		const el = track;
-		return () => el.removeEventListener('scrollend', onSettle);
+		return () => el.removeEventListener('scrollend', resolveSettle);
 	});
 
 	$effect(() => {
@@ -213,16 +280,7 @@
 		<p class="section-eyebrow">Achievements</p>
 		<h2 id="projects-heading" class="section-heading">My Projects</h2>
 
-		<div
-			class="carousel"
-			role="region"
-			aria-label="Projects carousel"
-			onmouseenter={() => (paused = true)}
-			onmouseleave={() => (paused = false)}
-			onpointerdown={() => (paused = true)}
-			onfocusin={() => (paused = true)}
-			onfocusout={() => (paused = false)}
-		>
+		<div class="carousel" role="region" aria-label="Projects carousel">
 			<button type="button" class="carousel-arrow prev" aria-label="Previous project" onclick={prev}>
 				<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -230,8 +288,13 @@
 			</button>
 
 			<div class="track" bind:this={track} onscroll={handleScroll}>
-				{#each projects as project, i}
-					<article class="material-card project-slide" class:current={i === activeIndex}>
+				{#each slidesList as project, idx}
+					<article
+						class="material-card project-slide"
+						data-clone={idx}
+						class:spotlight={idx === (hoverIdx ?? activeIndex + 1)}
+						aria-hidden={project.clone || undefined}
+					>
 						<div class="project-header">
 							<h3 class="project-title">{project.title}</h3>
 							<span class="badge-chip">{project.year}</span>
@@ -247,6 +310,7 @@
 							class="project-link"
 							target="_blank"
 							rel="noopener noreferrer"
+							tabindex={project.clone ? -1 : undefined}
 						>
 							View project
 							<svg class="project-link-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +340,7 @@
 					class="dot"
 					class:active={i === activeIndex}
 					aria-label="Go to project {i + 1}"
-					onclick={() => scrollToSlide(i)}
+					onclick={() => scrollToProject(i)}
 				></button>
 			{/each}
 		</div>
@@ -343,13 +407,21 @@
 			box-shadow 0.4s ease;
 	}
 
-	/* One spotlight for both mechanisms: hovering a slide gives it exactly the
-	   treatment the current slide has — full opacity, accent border, accent
-	   strip, gentle lift — instead of the generic material-card hover. The
-	   extra specificity here also overrides app.css `.material-card:hover`,
-	   so carousel cards no longer lift/shadow independently of the spotlight. */
-	.project-slide:hover,
-	.project-slide.current {
+	/* The global .material-card hover is neutralized inside the carousel: the
+	   spotlight below (JS-driven, exactly one card) is the single visual focus.
+	   The scoped selectors out-rank app.css's .material-card:hover, so carousel
+	   cards never lift/shadow independently of the spotlight. */
+	.project-slide,
+	.project-slide:hover {
+		transform: none;
+		border-color: var(--border-hairline);
+		background: var(--surface-gradient);
+		box-shadow: var(--shadow-card);
+	}
+
+	/* Exactly one card carries .spotlight (hover wins over the scroll position).
+	   Full opacity + accent border + gentle lift. */
+	.project-slide.spotlight {
 		opacity: 1;
 		filter: none;
 		transform: translateY(-5px);
@@ -358,8 +430,13 @@
 		box-shadow: var(--shadow-card-hover);
 	}
 
-	.project-slide:hover::before,
-	.project-slide.current::before {
+	/* Scoped specificity beats app.css's .material-card:hover::before, keeping
+	   the accent strip off every non-spotlight card. */
+	.project-slide::before {
+		opacity: 0;
+	}
+
+	.project-slide.spotlight::before {
 		opacity: 1;
 	}
 
