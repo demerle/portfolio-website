@@ -53,41 +53,107 @@
 	];
 
 	const AUTOPLAY_MS = 4500;
+	const SETTLE_MS = 200;
+	const SETTLE_MAX_MS = 1200;
+
 	let track: HTMLDivElement | null = $state(null);
 	let activeIndex = $state(0);
 	let paused = $state(false);
 
-	function stepSize(): number {
-		const firstSlide = track?.querySelector<HTMLElement>('.project-slide');
-		if (!firstSlide) return 0;
-		const style = window.getComputedStyle(firstSlide);
-		const gap = parseFloat(window.getComputedStyle(track!).columnGap || '0');
-		return firstSlide.offsetWidth + gap;
+	// While a programmatic scroll is in flight, scroll-derived index updates are
+	// suppressed so the highlight doesn't cascade through intermediate slides.
+	let programmatic = false;
+	let settleTimer = 0;
+	let scrollRaf = 0;
+
+	function slides(): HTMLElement[] {
+		if (!track) return [];
+		return Array.from(track.children) as HTMLElement[];
 	}
 
-	function goTo(index: number) {
+	// offsetLeft of slides and of the track share the same offsetParent
+	// (.carousel is the nearest positioned ancestor), so this difference is the
+	// slide's position relative to the track's scroll content — transform-free,
+	// unlike getBoundingClientRect.
+	function slideLeft(slide: HTMLElement): number {
+		return slide.offsetLeft - (track?.offsetLeft ?? 0);
+	}
+
+	function nearestIndex(): number {
+		const list = slides();
+		if (!track || list.length === 0) return activeIndex;
+		const viewportCenter = track.scrollLeft + track.clientWidth / 2;
+		let best = 0;
+		let bestDist = Infinity;
+		for (let i = 0; i < list.length; i++) {
+			const center = slideLeft(list[i]) + list[i].offsetWidth / 2;
+			const dist = Math.abs(center - viewportCenter);
+			if (dist < bestDist) {
+				bestDist = dist;
+				best = i;
+			}
+		}
+		return best;
+	}
+
+	function clearSettle() {
+		if (settleTimer !== 0) {
+			window.clearTimeout(settleTimer);
+			settleTimer = 0;
+		}
+	}
+
+	function armSettle(delay: number) {
+		clearSettle();
+		settleTimer = window.setTimeout(() => {
+			settleTimer = 0;
+			if (programmatic) {
+				programmatic = false;
+				activeIndex = nearestIndex();
+			}
+		}, delay);
+	}
+
+	// Single scroll entry point used by arrows, dots and autoplay. Scrolls the
+	// target slide's center to the track's viewport center (the browser clamps
+	// the edges, so first/last slides rest on their boundaries).
+	function scrollToSlide(index: number) {
 		if (!track) return;
-		const size = stepSize();
-		if (!size) return;
+		const list = slides();
 		const target = (index + projects.length) % projects.length;
-		track.scrollTo({ left: target * size, behavior: 'smooth' });
+		const slide = list[target];
+		if (!slide) return;
+		const left = slideLeft(slide) - (track.clientWidth - slide.offsetWidth) / 2;
+		programmatic = true;
 		activeIndex = target;
+		// Bound the suppression in case no scroll events fire (e.g. instant scroll);
+		// scrollend (below) or per-event re-arming settles it sooner.
+		armSettle(SETTLE_MAX_MS);
+		track.scrollTo({ left, behavior: 'smooth' });
 	}
 
 	function next() {
-		goTo(activeIndex + 1);
+		scrollToSlide(activeIndex + 1);
 	}
 
 	function prev() {
-		goTo(activeIndex - 1);
+		scrollToSlide(activeIndex - 1);
 	}
 
 	function handleScroll() {
 		if (!track) return;
-		const size = stepSize();
-		if (!size) return;
-		activeIndex = Math.round(track.scrollLeft / size) % projects.length;
-		if (activeIndex < 0) activeIndex += projects.length;
+		if (programmatic) {
+			// Extend suppression while the smooth scroll is still moving; clears
+			// SETTLE_MS after the last scroll event (covers browsers without
+			// `scrollend`, e.g. Safari < 18.4).
+			armSettle(SETTLE_MS);
+			return;
+		}
+		if (scrollRaf !== 0) window.cancelAnimationFrame(scrollRaf);
+		scrollRaf = window.requestAnimationFrame(() => {
+			scrollRaf = 0;
+			activeIndex = nearestIndex();
+		});
 	}
 
 	// Autoplay — pauses on hover, touch, or focus
@@ -102,6 +168,44 @@
 	function reducedAutoplay(): boolean {
 		return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	}
+
+	// Center the first slide on load so the muted/spotlight states match the view.
+	$effect(() => {
+		if (!browser || !track) return;
+		const slide = slides()[0];
+		if (!slide) return;
+		programmatic = true;
+		clearSettle();
+		track.scrollTo({
+			left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
+			behavior: 'auto'
+		});
+		armSettle(SETTLE_MAX_MS);
+	});
+
+	// `scrollend` fires once the scroll (including mandatory snap adjustment) has
+	// fully stopped — the earliest reliable moment to hand the highlight back to
+	// scroll-derived tracking.
+	$effect(() => {
+		if (!browser || !track) return;
+		const onSettle = () => {
+			clearSettle();
+			if (programmatic) {
+				programmatic = false;
+				activeIndex = nearestIndex();
+			}
+		};
+		track.addEventListener('scrollend', onSettle);
+		const el = track;
+		return () => el.removeEventListener('scrollend', onSettle);
+	});
+
+	$effect(() => {
+		return () => {
+			clearSettle();
+			if (scrollRaf !== 0) window.cancelAnimationFrame(scrollRaf);
+		};
+	});
 </script>
 
 <section id="projects" class="section" aria-labelledby="projects-heading">
@@ -172,7 +276,7 @@
 					class="dot"
 					class:active={i === activeIndex}
 					aria-label="Go to project {i + 1}"
-					onclick={() => goTo(i)}
+					onclick={() => scrollToSlide(i)}
 				></button>
 			{/each}
 		</div>
@@ -205,7 +309,14 @@
 		gap: 1.25rem;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
-		padding: 0.5rem 0 1rem;
+		/* Horizontal padding equal to (track − slide)/2 gives the first and last
+		   slides a reachable centered snap position too — without it the scroll
+		   clamps at the edges and the nearest-slice math there skips to the
+		   neighbor. The percentage resolves against the carousel width, which
+		   matches the track's width. Negative result (slide wider than track,
+		   small screens) is clamped to 0 by the browser, which is fine since an
+		   oversized slide can never center anyway. */
+		padding: 0.5rem calc((100% - min(88vw, 26rem)) / 2) 1rem;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 	}
@@ -232,9 +343,24 @@
 			box-shadow 0.4s ease;
 	}
 
+	/* One spotlight for both mechanisms: hovering a slide gives it exactly the
+	   treatment the current slide has — full opacity, accent border, accent
+	   strip, gentle lift — instead of the generic material-card hover. The
+	   extra specificity here also overrides app.css `.material-card:hover`,
+	   so carousel cards no longer lift/shadow independently of the spotlight. */
+	.project-slide:hover,
 	.project-slide.current {
 		opacity: 1;
 		filter: none;
+		transform: translateY(-5px);
+		border-color: rgba(33, 150, 243, 0.18);
+		background: var(--surface-gradient-hover);
+		box-shadow: var(--shadow-card-hover);
+	}
+
+	.project-slide:hover::before,
+	.project-slide.current::before {
+		opacity: 1;
 	}
 
 	.project-header {

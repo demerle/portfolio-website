@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import ThreeBackground from './ThreeBackground.svelte';
 
-	const roles = ['CS Student @ NJIT', 'Software Engineering Intern', 'Music-Tech Builder'];
+	const roles = ['CS Tutor @ NJIT', 'System Engineering Intern', 'Top 1 Engineer'];
 
 	let typedText = $state('');
 	let roleIndex = 0;
@@ -78,11 +78,12 @@
 				LinkedIn
 			</a>
 		</div>
-
+        <!--
 		<div class="hero-status">
 			<span class="status-dot"></span>
 			<span>Open to software engineering roles</span>
 		</div>
+		-->
 	</div>
 
 	<a href="#about" class="scroll-indicator" aria-label="Scroll down">

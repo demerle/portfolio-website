@@ -77,19 +77,19 @@
 			<div class="about-bio material-card">
 				<p>
 					I'm Daniel Emerle, a Computer Science major (Minor in Business) at NJIT with a
-					3.8 GPA, graduating May 2027. Since January 2026, I've been a System/Software
+					3.8 GPA, graduating May 2027. From January to August 2026, I worked as a System/Software
 					Engineering Intern at <strong>Control Associates / Continua Process
-					Systems</strong>, where I work on the TakeoffAI project — using ML to extract
+					Systems</strong>, where I was the lead contributor on the TakeoffAI project: using ML to extract
 					bid-estimate information from engineering drawings.
 				</p>
 				<p>
 					There, I've shipped things like a YOLO classification pipeline (tuned from 75%
-					to 98% accuracy), a production TimescaleDB/Snowflake-schema data layer, an MCP
-					server that exposes model-training tooling to AI agents, and a full Ignition
-					Perspective UI.
+					to 98% accuracy), a production TimescaleDB/Snowflake-schema database and analytics pipeline, an MCP
+					server that exposes model-training and inference tooling to AI agents, and an Ignition
+					Perspective (Inductive Automation) user interface.
 				</p>
 				<p>
-					Outside of work and class, I'm a TA for CS100 and I build music-tech tools —
+					Outside of work and class, I'm a TA for CS100 and I build music-tech tools
 					pipelines that turn raw sheet-music PDFs into MusicXML, MIDI, and Synthesia
 					videos. I like working where data, backend systems, and automation meet.
 				</p>
